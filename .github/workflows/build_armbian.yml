@@ -1,0 +1,147 @@
+#========================================================================================================================
+# Description: Build Armbian For Amlogic S9xxx STB
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#========================================================================================================================
+
+name: Build Armbian For Amlogic
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_board:
+        description: 'Optional: lepotato / odroidn2'
+        required: false
+        default: 'lepotato'
+  schedule:
+    - cron: '0 17 * * 0'
+
+env:
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: false
+  DELETE_RELEASE: false
+  DELETE_ARTIFACTS: true
+  SERVERCHAN_SCKEY: true
+  KEEP_DAY: 1
+  KEEP_MININUM_RUNS: 0
+  KEEP_MININUM_RELEASE: 2
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: telegrame_bot
+      run: |
+        if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+          curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
+          您正在使用kissyouhunter仓库的Armbian for N1编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+        fi      
+
+    - name: MachineType
+      run: |
+        cat /proc/cpuinfo
+        cat /proc/meminfo
+        cat /etc/issue
+        cat /proc/version    
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        ARR_BOARD=("lepotato" "odroidn2")
+        if  [[ -n "${{ github.event.inputs.set_board }}" && -n "$(echo "${ARR_BOARD[@]}" | grep -w "${{ github.event.inputs.set_board }}")" ]]; then
+            set_board="${{ github.event.inputs.set_board }}"
+        else
+            set_board="lepotato"
+        fi
+        echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
+        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+    - name: Download source code
+      id: down
+      run: |
+        git clone --depth 1 https://github.com/armbian/build.git
+        
+    - name: Build Armbian [ ${{ env.ARMBIAN_BOARD }} ]
+      id: build
+      run: |
+        cd build/
+        sudo chmod +x compile.sh
+        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST=armbian BRANCH=current RELEASE=buster BUILD_MINIMAL=no \
+                          BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+        echo "::set-output name=status::success"
+
+    - name: Make Armbian for amlogic s9xxx
+      id: make
+      if: steps.build.outputs.status == 'success'
+      run: |
+        sudo chmod +x make
+        sudo ./make s905d 5.4.157_5.10.77_5.14.16
+        cd ./build/output/images && sudo gzip *.img && sync
+        echo "FILEPATH=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Upload Armbian image to Actions
+      uses: kittaakos/upload-artifact-as-is@master
+      if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      with:
+        path: ${{ env.FILEPATH }}/
+
+    - name: Upload Armbian image to Release
+      id: release
+      uses: ncipollo/release-action@v1
+      if: steps.make.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+        artifacts: ${{ env.FILEPATH }}/*
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          This is Armbian image for amlogic s9xxx STB
+          * Firmware information
+          Default username: root
+          Default password: 1234
+          Install to EMMC command: armbian-install
+          Update command: armbian-update
+
+    - name: Delete older releases
+      uses: dev-drprasad/delete-older-releases@master
+      if: env.DELETE_RELEASE == 'true'
+      with:
+        keep_latest: ${{ env.KEEP_MININUM_RELEASE }}
+        delete_tags: true
+        delete_tag_pattern: _
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Delete older workflow runs and artifacts
+      uses: Mattraks/delete-workflow-runs@main
+      if: env.DELETE_ARTIFACTS == 'true'
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        retain_days: ${{ env.KEEP_DAY }}
+        keep_minimum_runs: ${{ env.KEEP_MININUM_RUNS }}
+          
+    - name: telegram_bot
+      run: |
+        if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+          curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的✨主人✨：
+          您使用kissyouhunter仓库的Armbian for N1固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+        fi
+        
