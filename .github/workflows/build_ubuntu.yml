@@ -83,8 +83,8 @@ jobs:
         sudo chmod +x compile.sh
         sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST=armbian BRANCH=current RELEASE=focal BUILD_MINIMAL=no \
                           BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
-        echo "::set-output name=status::success"
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
 
 #    - name: Make Armbian for amlogic s9xxx
 #      id: make
