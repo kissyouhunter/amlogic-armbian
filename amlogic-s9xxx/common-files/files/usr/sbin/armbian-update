@@ -24,8 +24,8 @@ else
 fi
 
 # Set default value
-SERVER_KERNEL_URL="https://api.github.com/repos/kissyouhunter/kernel_N1/contents/kernel"
-GITHUB_RAW="https://raw.githubusercontent.com/kissyouhunter/kernel_N1/main/kernel"
+SERVER_KERNEL_URL="https://api.github.com/repos/ophub/flippy-kernel/contents/library"
+GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/amlogic-s9xxx"
 ENV_ARMBIAN_FILE="/etc/armbian-aml-release"
 
 # Encountered a serious error, abort the script execution
@@ -71,11 +71,8 @@ if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; th
 
         LATEST_VERSION_K10_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.10.[0-9]+"  | sed -e "s/5.10.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K10="5.10.${LATEST_VERSION_K10_LATEST}"
-		
-		LATEST_VERSION_K14_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.14.[0-9]+"  | sed -e "s/5.14.//g" | sort -n | sed -n '$p')
-        LATEST_VERSION_K14="5.14.${LATEST_VERSION_K14_LATEST}"
 
-        echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K14} ]"
+        echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} ]"
         echo  "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
         read  KERNEL_NUM
         [ -n "${KERNEL_NUM}" ] || KERNEL_NUM="${LATEST_VERSION_K4}"
