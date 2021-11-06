@@ -77,6 +77,7 @@ if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; th
 
         echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K14} ]"
         echo  "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
+        echo  "Please do NOT update to version 5.14.y if your OS is on emmc!!!}"
         read  KERNEL_NUM
         [ -n "${KERNEL_NUM}" ] || KERNEL_NUM="${LATEST_VERSION_K4}"
     else
