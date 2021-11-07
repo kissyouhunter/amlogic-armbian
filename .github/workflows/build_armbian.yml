@@ -89,7 +89,6 @@ jobs:
       id: make
       if: steps.build.outputs.status == 'success'
       run: |
-#        sudo chmod -R 755 .
         sudo chmod +x make
         sudo ./make s905d 5.4.158_5.10.78_5.14.17_5.15.1
         cd ./build/output/images && sudo gzip *.img && sync
