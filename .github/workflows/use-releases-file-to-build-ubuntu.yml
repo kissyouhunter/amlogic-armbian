@@ -44,7 +44,7 @@ jobs:
       run: |
         [ -d build/output/images ] || mkdir -p build/output/images
         curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_focal_for_N1/Armbian_*-trunk_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
-        [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
+        [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN) && wget https://github.com/kissyouhunter/amlogic-armbian/releases/download/focal/Armbian_21.11.0-trunk_Lepotato_focal_current_5.10.78.img.gz.zip
         cd ./build/output/images && gzip -df *.img.gz && sync && cd ../../../
         sudo chmod +x make_ubuntu
         sudo ./make_ubuntu s905d 5.4.158_5.10.78_5.14.17_5.15.1
