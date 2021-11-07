@@ -398,6 +398,9 @@ copy_files() {
         # Custom banner name
         sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
 
+        # remove linux-image-current-meson64
+        sudo chroot && apt remove linux-image-current-meson64 -y && exit
+
         sync
 
     cd ${make_path}
