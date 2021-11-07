@@ -399,7 +399,7 @@ copy_files() {
         sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
 
         # remove linux-image-current-meson64
-        sudo chroot ${tag_rootfs} && apt remove linux-image-current-meson64 -y && exit
+        sudo chroot ${tag_rootfs} && apt update && apt upgrade –y && apt remove linux-image-current-meson64 -y && exit
 
         sync
 
