@@ -29,7 +29,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-21.04
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
@@ -85,16 +85,15 @@ jobs:
                           BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
         echo "::set-output name=status::success"
 
-#    - name: Make Armbian for amlogic s9xxx
-#      id: make
-#      if: steps.build.outputs.status == 'success'
-#      run: |
-#        sudo chmod +x make
-#        sudo ./make s905d 5.4.157_5.10.77_5.14.16
-#        cd ./build/output/images && sudo gzip *.img && sync
-#        echo "FILEPATH=$PWD" >> $GITHUB_ENV
-#        echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
-#        echo "::set-output name=status::success"
+    - name: Make Armbian for amlogic s9xxx
+      id: make
+      if: steps.build.outputs.status == 'success'
+      run: |
+        sudo chmod +x make
+        cd ./build/output/images && sudo gzip *.img && sync
+        echo "FILEPATH=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
 
     - name: Upload Armbian image to Actions
       uses: kittaakos/upload-artifact-as-is@master
