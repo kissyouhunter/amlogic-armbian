@@ -383,7 +383,7 @@ copy_files() {
         rm -f etc/apt/sources.list.save 2>/dev/null
         rm -f etc/apt/*.gpg~ 2>/dev/null
         rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
-        rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
+#        rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
         # Add firmware information to the etc/armbian-aml-release
         echo "FDTFILE='${FDTFILE}'" >> etc/armbian-aml-release 2>/dev/null
@@ -397,9 +397,6 @@ copy_files() {
         
         # Custom banner name
         sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
-
-        # remove linux-image-current-meson64
-        sudo chroot ${tag_rootfs} && apt update && apt upgrade –y && apt remove linux-image-current-meson64 -y && exit
 
         sync
 
