@@ -23,17 +23,13 @@ sudo add-apt-repository "deb [arch=amd64,armhf] https://mirrors.aliyun.com/docke
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Configure Docker to start automatically after booting
-sudo systemctl enable docker.service
-sudo systemctl enable containerd.service
-
 # Install Docker-compose
 wget -O /usr/local/bin/docker-compose https://ghproxy.com/https://github.com/docker/compose/releases/download/v2.1.0/docker-compose-linux-aarch64
 chmod +x /usr/local/bin/docker-compose
 
-# Set up ordinary users to run docker directly
-sudo usermod -aG docker $USER
-newgrp docker
+# Configure Docker to start automatically after booting
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
 
 # Save Settings
 rm -f /etc/apt/sources.list.save 2>/dev/null
@@ -43,5 +39,9 @@ sync
 # Check Version
 docker -v
 docker-compose -v
+
+# Set up ordinary users to run docker directly
+sudo usermod -aG docker $USER
+newgrp docker
 
 exit 0
