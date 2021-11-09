@@ -12,12 +12,12 @@ sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
 # Install GPG certificate
-#curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | apt-key add -
-curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
+curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | apt-key add -
+#curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
 
 # Add software source information
-#sudo add-apt-repository "deb [arch=amd64,armhf] https://mirrors.aliyun.com/docker-ce/linux/debian $(lsb_release -cs) stable"
-sudo add-apt-repository "deb [arch=amd64,armhf] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+sudo add-apt-repository "deb [arch=amd64,armhf] https://mirrors.aliyun.com/docker-ce/linux/debian $(lsb_release -cs) stable"
+#sudo add-apt-repository "deb [arch=amd64,armhf] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 
 # Update and install Docker
 sudo apt-get update
