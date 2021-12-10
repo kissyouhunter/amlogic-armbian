@@ -35,19 +35,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-    - name: telegrame_bot
-      run: |
-        if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
-          curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
-          您正在使用kissyouhunter仓库的Armbian for N1编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
-        fi      
+      - name: telegrame_bot
+        run: |
+          if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+            curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
+            您正在使用kissyouhunter仓库的Armbian for N1编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          fi      
 
-    - name: MachineType
-      run: |
-        cat /proc/cpuinfo
-        cat /proc/meminfo
-        cat /etc/issue
-        cat /proc/version   
+      - name: MachineType
+        run: |
+          cat /proc/cpuinfo
+          cat /proc/meminfo
+          cat /etc/issue
+          cat /proc/version   
 
       - name: Initialization environment
         env:
