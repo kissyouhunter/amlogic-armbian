@@ -20,17 +20,17 @@ tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
-kernel_library="https://github.com/ophub/kernel/tree/main/pub"
+kernel_library="https://github.com/kissyouhunter/kernel_N1/tree/main/kernel"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
-version_branch="stable"
 
-build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
+
+build_armbian=("s905d")
 build_kernel=("default")
 auto_kernel="true"
 
 SKIP_MB=68
 BOOT_MB=256
-ROOT_MB=2748
+ROOT_MB=1700
 #===== Do not modify the following parameter settings, End =======
 
 die() {
@@ -49,7 +49,7 @@ download_kernel() {
     if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
         kernel_library="${kernel_library//tree\/main/trunk}"
     fi
-    kernel_library="${kernel_library}/${version_branch}"
+    kernel_library="${kernel_library}"
 
     # Set empty array
     tmp_arr_kernels=()
@@ -458,7 +458,6 @@ clean_tmp() {
 while [ "${1}" ]; do
     case "${1}" in
     -d | --default)
-        : ${version_branch:="${version_branch}"}
         : ${build_armbian:="${build_armbian}"}
         : ${build_kernel:="${build_kernel}"}
         : ${ROOT_MB:="${ROOT_MB}"}
@@ -492,14 +491,6 @@ while [ "${1}" ]; do
             shift
         else
             die "Invalid -a parameter [ ${2} ]!"
-        fi
-        ;;
-    -v | --versionbranch)
-        if [ -n "${2}" ]; then
-            version_branch="${2}"
-            shift
-        else
-            die "Invalid -v parameter [ ${2} ]!"
         fi
         ;;
     -s | --size)
