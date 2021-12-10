@@ -17,7 +17,7 @@ on:
         description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
-  schedule:
+ # schedule:
     #- cron: "0 17 * * 0"
 
 env:
