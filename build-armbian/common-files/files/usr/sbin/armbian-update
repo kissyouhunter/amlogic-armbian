@@ -31,7 +31,7 @@ elif [[ "$(ls *.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -gt "3" ]]; then
     try_boot=$(ls boot-*.tar.gz 2>/dev/null | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
     [ -n "${try_boot}" ] && INPUTS_KERNEL="${try_boot}"
 else
-    die "Please enter the kernel version number, such as: armbian-update 5.4.160"
+    die "Please enter the kernel version number, such as: armbian-update 5.4.164"
 fi
 
 # Specify version branch, such as: stable
@@ -103,7 +103,7 @@ if [[ "$(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc
     fi
 
     echo -e "Kernel version: ${INPUTS_KERNEL}"
-    echo -e "Start downloading the kernel from [ github.com/ophub/kernel/tree/main/pub/${version_branch} ] to [ ${P4_PATH} ]..."
+    echo -e "Start downloading the kernel from [ github.com/kissyouhunter ] to [ ${P4_PATH} ]..."
 
     # Delete tmp files
     rm -f ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz 2>/dev/null
