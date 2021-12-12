@@ -15,8 +15,8 @@ on:
         default: "bullseye"
 
 env:
-  UPLOAD_FIRMWARE: false
-  UPLOAD_RELEASE: true
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
 
 jobs:
