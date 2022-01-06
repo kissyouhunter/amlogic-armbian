@@ -12,7 +12,7 @@ on:
       set_release:
         description: "RELEASE: bullseye / focal"
         required: false
-        default: "bullseye"
+        default: "focal"
       set_board:
         description: "BOARD: lepotato / odroidn2"
         required: false
@@ -26,7 +26,6 @@ on:
 
 env:
   UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: false
   SERVERCHAN_SCKEY: true
   TZ: Asia/Shanghai
 
@@ -70,7 +69,7 @@ jobs:
           ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="bullseye"
+              set_release="focal"
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
