@@ -1,24 +1,4 @@
 #==========================================================================
-# Description: Build Armbian For Amlogic S9xxx STB
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#==========================================================================
-
-name: Use Releases file to build armbian
-
-on:
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      sel_tags_keywords:
-        description: "Select tags keywords: bullseye / focal"
-        required: false
-        default: "bullseye"
-
-env:
-  UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: false
-  TZ: Asia/Shanghai
-#==========================================================================
 # Description: Build Armbian For Amlogic s9xxx tv box
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
