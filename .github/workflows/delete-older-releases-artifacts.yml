@@ -12,6 +12,20 @@ on:
     - cron: "0 23 * * 0"
 
 env:
+  DELETE_RELEASE: true#==========================================================================
+# https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Automatically delete older releases and artifacts
+#==========================================================================
+
+name: Delete older releases and artifacts
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+  #schedule:
+    #- cron: "0 23 * * 0"
+
+env:
   DELETE_RELEASE: true
   DELETE_ARTIFACTS: true
   KEEP_DAY: 1
