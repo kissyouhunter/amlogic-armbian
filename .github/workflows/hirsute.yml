@@ -95,23 +95,6 @@ jobs:
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         with:
           path: ${{ env.FILEPATH }}/
-
-      - name: Upload Armbian image to Release
-        id: release
-        uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && !cancelled()
-        with:
-          tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.FILE_DATE }}
-          artifacts: ${{ env.FILEPATH }}/*
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            This is Armbian image for Amlogic s9xxx tv box
-            * Firmware information
-            Default username: root
-            Default password: 1234
-            Install to EMMC command: armbian-install
-            Update command: armbian-update
             
       - name: telegram_bot
         run: |
