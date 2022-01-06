@@ -1,5 +1,5 @@
 #==========================================================================
-# Description: Build Armbian For Amlogic S9xxx STB
+# Description: Build Armbian For Amlogic s9xxx tv box
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
@@ -17,7 +17,11 @@ on:
         description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
- # schedule:
+      set_opts:
+        description: "More build options: for compile.sh"
+        required: false
+        default: ""
+  #schedule:
     #- cron: "0 17 * * 0"
 
 env:
@@ -63,7 +67,7 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
               set_release="bullseye"
@@ -77,6 +81,8 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
+          echo "ARMBIAN_MORE_OPTS=${{ github.event.inputs.set_opts }}" >> $GITHUB_ENV
+
       - name: Download source code
         id: down
         run: |
@@ -87,16 +93,17 @@ jobs:
         run: |
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} HOST=armbian BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} BUILD_MINIMAL=no \
-                            BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current \
+                            BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
+                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha,img ${{ env.ARMBIAN_MORE_OPTS }}
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
-        if: steps.compile.outputs.status == 'success'
+        if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           sudo chmod +x rebuild
-          sudo ./rebuild -d -b s905d -k 5.4.164
+          sudo ./rebuild -d -b s905d -k 5.4.170
           cd build/output/images/ && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
@@ -111,14 +118,14 @@ jobs:
       - name: Upload Armbian image to Release
         id: release
         uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
         with:
           tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is Armbian image for amlogic s9xxx STB
+            This is Armbian image for Amlogic s9xxx tv box
             * Firmware information
             Default username: root
             Default password: 1234
