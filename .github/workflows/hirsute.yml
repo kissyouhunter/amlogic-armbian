@@ -65,7 +65,7 @@ jobs:
           down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           [ -z "${down_file}" ] && echo "Invalid download file." && exit 1
-          wget -q -P https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian_Aml_buster_2021.11.08.0444/Armbian_21.11.0-trunk_Lepotato_hirsute_current_5.10.84.img.gz "${down_file}" && sync
+          wget https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian_Aml_buster_2021.11.08.0444/Armbian_21.11.0-trunk_Lepotato_hirsute_current_5.10.84.img.gz "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
           set_release="_"
