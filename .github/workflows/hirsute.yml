@@ -17,6 +17,7 @@ on:
 env:
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: false
+  SERVERCHAN_SCKEY: true
   TZ: Asia/Shanghai
 
 jobs:
