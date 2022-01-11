@@ -22,7 +22,7 @@ tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
 kernel_library="https://github.com/kissyouhunter/kernel_N1/tree/main/kernel"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
-version_branch="stable"
+
 
 build_armbian=("s905d")
 build_kernel=("default")
@@ -30,16 +30,16 @@ auto_kernel="true"
 
 SKIP_MB=68
 BOOT_MB=256
-ROOT_MB=2748
+ROOT_MB=2000
 #===== Do not modify the following parameter settings, End =======
 
 die() {
-    echo -e " [\033[1;91m Error \033[0m] ${1}"
+    echo -e " [\033[1;31m Error \033[0m] ${1}"
     exit 1
 }
 
 process() {
-    echo -e " [\033[1;92m ${build_soc}${out_kernel} \033[0m] ${1}"
+    echo -e " [\033[1;32m ${build_soc}${out_kernel} \033[0m] ${1}"
 }
 
 download_kernel() {
@@ -113,7 +113,7 @@ make_image() {
     fi
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_focal_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_bullseye_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file}
     sync
 
@@ -252,22 +252,6 @@ copy_files() {
         ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
         AMLOGIC_SOC="s905d"
         ;;
-    s905d-ki)
-        FDTFILE="meson-gxl-s905d-mecool-ki-pro.dtb"
-        UBOOT_OVERLOAD="u-boot-p201.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905d"
-        ;;
-    s905 | beelinkminimx | mxqpro+)
-        FDTFILE="meson-gxbb-vega-s95-telos.dtb"
-        #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
-        UBOOT_OVERLOAD="u-boot-s905.bin"
-        #UBOOT_OVERLOAD="u-boot-p201.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905"
-        ;;
     s912 | h96proplus | octopus)
         FDTFILE="meson-gxm-octopus-planet.dtb"
         UBOOT_OVERLOAD="u-boot-zyxq.bin"
@@ -369,8 +353,8 @@ copy_files() {
     fi
     #
     # Modify different releases for usr/sbin/armbian-docker
-    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${diff_release_name}")" ]]; then
-        sed -i "s|ubuntu|debian|g" ${tag_rootfs}/usr/sbin/armbian-docker
+    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_ubuntu[@]}" | grep -w "${diff_release_name}")" ]]; then
+        sed -i "s|debian|ubuntu|g" ${tag_rootfs}/usr/sbin/armbian-docker
     fi
 
     # Processing partition files: bootfs
@@ -401,6 +385,8 @@ copy_files() {
     # Replace the boot directory with the latest file
     rm -rf boot 2>/dev/null && mkdir -p boot && sync
 
+    (cd usr/lib/firmware && mv *.hcd brcm/)
+
     # Add soft connection
     ln -sf usr/bin bin
     ln -sf usr/lib lib
@@ -422,6 +408,15 @@ copy_files() {
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
+    # Set interfaces
+    interfaces_file="etc/network/interfaces"
+    if [ -f "${interfaces_file}" ]; then
+        mac_hexchars="0123456789ABCDEF"
+        mac_end=$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')
+        random_mac_addr="9E:60:1F${mac_end}"
+        sed -i "s|hwaddress ether.*|hwaddress ether ${random_mac_addr}|g" ${interfaces_file}
+    fi
+
     # Add firmware information to the etc/armbian-aml-release
     echo "FDTFILE='${FDTFILE}'" >>etc/armbian-aml-release 2>/dev/null
     echo "U_BOOT_EXT='${K510}'" >>etc/armbian-aml-release 2>/dev/null
@@ -435,35 +430,6 @@ copy_files() {
 
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
-
-    # Get random macaddr
-    mac_hexchars="0123456789ABCDEF"
-    mac_end=$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')
-    random_macaddr="9E:61${mac_end}"
-
-    # Set interfaces macaddr
-    interfaces_file="etc/network/interfaces"
-    [ -f "${interfaces_file}" ] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
-    # Optimize wifi/bluetooth module
-    [ -d "usr/lib/firmware/brcm" ] && (
-        cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
-
-        # gtking/gtking pro is bcm4356 wifi/bluetooth, wifi5 module AP6356S
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:00/" "brcmfmac4356-sdio.txt" >"brcmfmac4356-sdio.azw,gtking.txt"
-        # gtking/gtking pro is bcm4356 wifi/bluetooth, wifi6 module AP6275S
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:01/" "brcmfmac4375-sdio.txt" >"brcmfmac4375-sdio.azw,gtking.txt"
-        # Phicomm N1 is bcm43455 wifi/bluetooth
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:02/" "brcmfmac43455-sdio.txt" >"brcmfmac43455-sdio.phicomm,n1.txt"
-        # MXQ Pro+ is AP6330(bcm4330) wifi/bluetooth
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:03/" "brcmfmac4330-sdio.txt" >"brcmfmac4330-sdio.crocon,mxq-pro-plus.txt"
-        # HK1 Box & H96 Max X3 is bcm54339 wifi/bluetooth
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:04/" "brcmfmac4339-sdio.ZP.txt" >"brcmfmac4339-sdio.amlogic,sm1.txt"
-        # old ugoos x3 is bcm43455 wifi/bluetooth
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:05/" "brcmfmac43455-sdio.txt" >"brcmfmac43455-sdio.amlogic,sm1.txt"
-        # new ugoos x3 is brm43456
-        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:06/" "brcmfmac43456-sdio.txt" >"brcmfmac43456-sdio.amlogic,sm1.txt"
-    )
 
     sync
 
@@ -480,7 +446,7 @@ copy_files() {
 clean_tmp() {
     cd ${tmp_outpath}
     # Rename version
-    [[ "${diff_release_name}" != "focal" ]] && rename "s/focal/${diff_release_name}/g" *.img 2>/dev/null && sync
+    [[ "${diff_release_name}" != "bullseye" ]] && rename "s/bullseye/${diff_release_name}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
     sync
 
@@ -492,7 +458,6 @@ clean_tmp() {
 while [ "${1}" ]; do
     case "${1}" in
     -d | --default)
-        : ${version_branch:="${version_branch}"}
         : ${build_armbian:="${build_armbian}"}
         : ${build_kernel:="${build_kernel}"}
         : ${ROOT_MB:="${ROOT_MB}"}
@@ -528,16 +493,8 @@ while [ "${1}" ]; do
             die "Invalid -a parameter [ ${2} ]!"
         fi
         ;;
-    -v | --versionbranch)
-        if [ -n "${2}" ]; then
-            version_branch="${2}"
-            shift
-        else
-            die "Invalid -v parameter [ ${2} ]!"
-        fi
-        ;;
     -s | --size)
-        if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
+        if [[ -n "${2}" && "${2}" -ge "1000" ]]; then
             ROOT_MB="${2}"
             shift
         else
@@ -563,7 +520,7 @@ armbian_original_kernel="$(echo ${armbian_image_name} | grep -oE '[4-5].[0-9]{1,
 # Show welcome message
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
 echo -e "\n"
-echo -e "Welcome to build Armbian for Amlogic s9xxx tv box!"
+echo -e "Welcome to build armbian for amlogic s9xxx STB!"
 echo -e "Armbian original file: [ ${armbian_image_name} ], Version: [ ${armbian_original_version} ], Kernel: [ ${armbian_original_kernel} ]"
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
