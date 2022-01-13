@@ -14,12 +14,13 @@ BOOT=256
 
 # Receive one-key command related parameters
 if [[ "${1}" == "no" ]]; then
-    AUTO_MAINLINE_UBOOT="no"
+    auto_mainline_uboot="no"
 else
-    AUTO_MAINLINE_UBOOT="yes"
+    auto_mainline_uboot="yes"
 fi
 
 echo "Start install armbian to emmc..."
+echo "安装armbian 到 emmc..."
 
 root_devname=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')
 if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
@@ -45,10 +46,12 @@ AMLOGIC_MODEL_LIST="
 12:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
 #13:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,1Gb Net
 #14:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100M Net
+#15:MECOOL KI Pro:s905d:meson-gxl-s905d-mecool-ki-pro.dtb:u-boot-p201.bin:NA:NA:2G/16G,1000M Net
 
 # Amlogic GXM Family
 #21:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Net
-#22:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band Wi-Fi/10-1000M LAN 64Bit BT4.0
+#22:H96 Pro Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:2G/32G,1Gb Net
+#23:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band Wi-Fi/10-1000M LAN 64Bit BT4.0
 
 # Amlogic G12A Family
 #31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
@@ -70,7 +73,7 @@ AMLOGIC_MODEL_LIST="
 #55:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
 #56:H96 Max X3:s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
 #57:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
-#58:Ugoos X3(OverClock):s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
+#58:Ugoos X3(OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 
 # Other
 #0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
@@ -137,7 +140,7 @@ parted -s "${DEV_EMMC}" mkpart primary fat32 $((SKIP * 1024 * 1024))b $(((SKIP +
 parted -s "${DEV_EMMC}" mkpart primary ext4 $(((SKIP + BOOT) * 1024 * 1024))b 100% 2>/dev/null
 
 echo "Start write u-boot"
-if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
+if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
     echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
@@ -225,21 +228,21 @@ done
 echo "Copy complete."
 
 echo "Update the relevant parameters of armbian-aml-release"
-ENV_ARMBIAN_FILE="${DIR_INSTALL}/etc/armbian-aml-release"
-sed -i '/FDTFILE/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "FDTFILE='${FDTFILE}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+ophub_release_file="${DIR_INSTALL}/etc/ophub-release"
+sed -i '/FDTFILE/d' ${ophub_release_file} 2>/dev/null
+echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/UBOOT_OVERLOAD/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/UBOOT_OVERLOAD/d' ${ophub_release_file} 2>/dev/null
+echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/MAINLINE_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/MAINLINE_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/ANDROID_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/SOC/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "SOC='${AMLOGIC_SOC}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
+echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
 echo "Update complete."
 sync
 
@@ -259,5 +262,6 @@ sleep 3
 
 echo "*************************************************************************************************"
 echo "Successful installed, please unplug the USB, re-insert the power supply to start the armbian."
+echo "安装成功，拔掉电源和U盘."
 echo "*************************************************************************************************"
 exit 0

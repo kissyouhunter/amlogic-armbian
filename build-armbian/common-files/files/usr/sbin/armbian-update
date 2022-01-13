@@ -1,49 +1,23 @@
 #!/bin/bash
 #==================================================================================================================================
-# Function: Armbian kernel update
-# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2020- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Kernel download server: https://github.com/ophub/kernel/tree/main/pub
+# Description: Armbian kernel update
+# Kernel download: https://github.com/ophub/flippy-kernel/tree/main/library
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install U-BOOT.
 # When there is no U-BOOT file in related directory, the script will auto try to download the file from the server for completion:
-# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot"
-# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
-#
-# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# Do not write main line U-BOOT command: armbian-update 5.4.150 stable no
-# Write the main line U-BOOT by default: armbian-update 5.4.150
+# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/amlogic-u-boot"
+# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
 #==================================================================================================================================
-
-echo -e "Ready to update, please wait..."
-# Encountered a serious error, abort the script execution
-die() {
-    echo -e " [Error] ${1}"
-    exit 1
-}
+# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
+# Do not write main line U-BOOT command: armbian-update 5.4.150 no
+# Write the main line U-BOOT by default: armbian-update 5.4.150
 
 # Receive one-key command related parameters
-# Specify the kernel, such as: 5.10.70
-if [ -n "${1}" ]; then
-    INPUTS_KERNEL="${1}"
-elif [[ "$(ls *.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -gt "3" ]]; then
-    try_boot=$(ls boot-*.tar.gz 2>/dev/null | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
-    [ -n "${try_boot}" ] && INPUTS_KERNEL="${try_boot}"
-else
-    die "Please enter the kernel version number, such as: armbian-update 5.4.164"
-fi
-
-# Specify version branch, such as: stable
-ARR_BRANCH=("stable" "beta")
-if [[ -n "${2}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${2}")" ]]; then
-    version_branch="${2}"
-else
-    version_branch="stable"
-fi
-
-# Specify whether to brush into the mainline u-boot, such as: yes
-if [[ "${3}" == "no" ]]; then
+INPUTS_KERNEL="${1}"
+if [[ "${2}" == "no" ]]; then
     AUTO_MAINLINE_UBOOT="no"
 else
     AUTO_MAINLINE_UBOOT="yes"
@@ -52,23 +26,31 @@ fi
 # Set default value
 SERVER_KERNEL_URL="https://api.github.com/repos/kissyouhunter/kernel_N1/contents/kernel"
 GITHUB_RAW="https://raw.githubusercontent.com/kissyouhunter/kernel_N1/main/kernel"
-ENV_ARMBIAN_FILE="/etc/armbian-aml-release"
+ENV_ARMBIAN_FILE="/etc/ophub-release"
+
+# Encountered a serious error, abort the script execution
+die() {
+    echo -e " [Error] ${1}"
+    exit 1
+}
+
+echo -e "Start update the armbian kernel."
+echo -e "开始更新 armbian 内核."
 
 # Find the partition where root is located
 ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
-[ -z "${ROOT_PTNAME}" ] && die "Cannot find the partition corresponding to the root file system!"
+if [ "${ROOT_PTNAME}" == "" ];then
+    echo "Cannot find the partition corresponding to the root file system!"
+    exit 1
+fi
 
 # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
 case ${ROOT_PTNAME} in
-mmcblk?p[1-4])
-    EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
-    ;;
-[hsv]d[a-z][1-4])
-    EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
-    ;;
-*)
-    die "Unable to recognize the disk type of ${ROOT_PTNAME}!"
-    ;;
+       mmcblk?p[1-4]) EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')" ;;
+    [hsv]d[a-z][1-4]) EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')" ;;
+                   *) echo "Unable to recognize the disk type of ${ROOT_PTNAME}!"
+                      exit 1
+                      ;;
 esac
 P4_PATH="${PWD}"
 
@@ -77,99 +59,97 @@ if [ -f "${ENV_ARMBIAN_FILE}" ]; then
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
 else
-    die "${ENV_ARMBIAN_FILE} file is missing!"
+    echo  "${ENV_ARMBIAN_FILE} file is missing!"
+    exit 1
 fi
 
-# Check 3 kernel files
-if [[ "$(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
+# Download 3 kernel files
+if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; then
+
     if [[ -z "${INPUTS_KERNEL}" ]]; then
-        LATEST_VERSION_K4_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.4.[0-9]+" | sed -e "s/5.4.//g" | sort -n | sed -n '$p')
+        LATEST_VERSION_K4_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.4.[0-9]+"  | sed -e "s/5.4.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K4="5.4.${LATEST_VERSION_K4_LATEST}"
-		
+
         LATEST_VERSION_K10_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.10.[0-9]+"  | sed -e "s/5.10.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K10="5.10.${LATEST_VERSION_K10_LATEST}"
 		
 		LATEST_VERSION_K15_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.15.[0-9]+"  | sed -e "s/5.15.//g" | sort -n | sed -n '$p')
-        LATEST_VERSION_K15="5.15.${LATEST_VERSION_K15_LATEST}"		
-		
+        LATEST_VERSION_K15="5.15.${LATEST_VERSION_K15_LATEST}"
+
         echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
-		echo "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
-        read KERNEL_NUM
-        if [ -n "${KERNEL_NUM}" ]; then
-            INPUTS_KERNEL="${KERNEL_NUM}"
-        else
-            INPUTS_KERNEL="${LATEST_VERSION_K4}"
-        fi
+		echo  "最新的内核版本为: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
+        echo  "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
+		echo  "请输入内核版本号,例如: ${LATEST_VERSION_K4}"
+        read  KERNEL_NUM
+        [ -n "${KERNEL_NUM}" ] || KERNEL_NUM="${LATEST_VERSION_K4}"
+    else
+        KERNEL_NUM="${INPUTS_KERNEL}"
     fi
 
-    echo -e "Kernel version: ${INPUTS_KERNEL}"
-    echo -e "Start downloading the kernel from [ github.com/kissyouhunter ] to [ ${P4_PATH} ]..."
+    echo -e "Kernel version: ${KERNEL_NUM}"
+	echo -e "内核版本: ${KERNEL_NUM}"
+    echo -e "Start downloading the kernel from github.com ..."
+	echo -e "正在从 github.com 上下载内核 ..."
 
     # Delete tmp files
-    rm -f ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz 2>/dev/null
+    rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz 2>/dev/null
     sync
 
     # Download boot file
-    SERVER_KERNEL_BOOT="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/boot-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_BOOT="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/boot-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_BOOT_NAME="${SERVER_KERNEL_BOOT##*/}"
     SERVER_KERNEL_BOOT_NAME="${SERVER_KERNEL_BOOT_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_BOOT}" -O "${P4_PATH}/${SERVER_KERNEL_BOOT_NAME}" >/dev/null 2>&1 && sync
     if [[ "$?" -eq "0" && -s "${P4_PATH}/${SERVER_KERNEL_BOOT_NAME}" ]]; then
         echo -e "01.01 The boot file download complete."
+		echo -e "01.01 boot 文件下载成功."
     else
         die "01.01 The boot file failed to download."
+		die "01.01 boot 文件下载失败."
     fi
 
     # Download dtb file
-    SERVER_KERNEL_DTB="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/dtb-amlogic-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_DTB="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/dtb-amlogic-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_DTB_NAME="${SERVER_KERNEL_DTB##*/}"
     SERVER_KERNEL_DTB_NAME="${SERVER_KERNEL_DTB_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_DTB}" -O "${P4_PATH}/${SERVER_KERNEL_DTB_NAME}" >/dev/null 2>&1 && sync
     if [[ "$?" -eq "0" && -s "${P4_PATH}/${SERVER_KERNEL_DTB_NAME}" ]]; then
         echo -e "01.02 The dtb file download complete."
+		echo -e "01.02 dtb 文件下载成功."
     else
         die "01.02 The dtb file failed to download."
+		die "01.02 dtb 文件下载失败."
     fi
 
     # Download modules file
-    SERVER_KERNEL_MODULES="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/modules-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_MODULES="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/modules-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_MODULES_NAME="${SERVER_KERNEL_MODULES##*/}"
     SERVER_KERNEL_MODULES_NAME="${SERVER_KERNEL_MODULES_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_MODULES}" -O "${P4_PATH}/${SERVER_KERNEL_MODULES_NAME}" >/dev/null 2>&1 && sync
     if [[ "$?" -eq "0" && -s "${P4_PATH}/${SERVER_KERNEL_MODULES_NAME}" ]]; then
         echo -e "01.03 The modules file download complete."
+		echo -e "01.03 modules 文件下载成功."
     else
         die "01.03 The modules file failed to download."
-    fi
-
-    # Download header file
-    SERVER_KERNEL_HEADER="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/header-.*.tar.gz" | head -n 1)"
-    if [ -n "${SERVER_KERNEL_HEADER}" ]; then
-        SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER##*/}"
-        SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER_NAME//%2B/+}"
-        wget -c "${SERVER_KERNEL_HEADER}" -O "${P4_PATH}/${SERVER_KERNEL_HEADER_NAME}" >/dev/null 2>&1 && sync
-        if [[ "$?" -eq "0" && -s "${P4_PATH}/${SERVER_KERNEL_HEADER_NAME}" ]]; then
-            echo -e "01.04 The header file download complete."
-        else
-            die "01.04 The header file failed to download."
-        fi
+		die "01.03 modules 文件下载失败."
     fi
 
     sync
 fi
 
-if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
-    if [ $(ls ${P4_PATH}/boot-${INPUTS_KERNEL}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 1 ]; then
-        build_boot=$(ls ${P4_PATH}/boot-${INPUTS_KERNEL}-*.tar.gz | head -n 1) && build_boot=${build_boot##*/}
-        custom_kernel_name=${build_boot/boot-/} && custom_kernel_name=${custom_kernel_name/.tar.gz/}
-        echo -e "custom_kernel_name: ${custom_kernel_name}"
+if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ge 3 ]; then
 
-        kernel_version=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+    if  [ $( ls ${P4_PATH}/boot-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ge 1 ]; then
+        build_boot=$( ls ${P4_PATH}/boot-*.tar.gz | head -n 1 ) && build_boot=${build_boot##*/}
+        echo -e "Update using [ ${build_boot} ] files. Please wait a moment ..."
+		echo -e "[ ${build_boot} ] 文件加载中 ..."
+        flippy_version=${build_boot/boot-/} && flippy_version=${flippy_version/.tar.gz/}
+        kernel_version=$(echo ${flippy_version} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
         kernel_vermaj=$(echo ${kernel_version} | grep -oE '^[1-9].[0-9]{1,3}')
         k510_ver=${kernel_vermaj%%.*}
         k510_maj=${kernel_vermaj##*.}
-        if [ ${k510_ver} -eq "5" ]; then
-            if [ "${k510_maj}" -ge "10" ]; then
+        if  [ ${k510_ver} -eq "5" ]; then
+            if  [ "${k510_maj}" -ge "10" ]; then
                 K510=1
             else
                 K510=0
@@ -181,35 +161,44 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
         fi
     else
         die "Have no boot-*.tar.gz file found in the ${P4_PATH} directory."
+		die "在 ${P4_PATH} 目录没有 boot-*.tar.gz 文件."
     fi
 
-    if [ -f "${P4_PATH}/dtb-amlogic-${custom_kernel_name}.tar.gz" ]; then
-        build_dtb="dtb-amlogic-${custom_kernel_name}.tar.gz"
+    if  [ -f ${P4_PATH}/dtb-amlogic-${flippy_version}.tar.gz ]; then
+        build_dtb="dtb-amlogic-${flippy_version}.tar.gz"
     else
         die "Have no dtb-amlogic-*.tar.gz file found in the ${P4_PATH} directory."
+		die "在 ${P4_PATH} 目录没有 dtb-amlogic-*.tar.gz 文件."
     fi
 
-    if [ -f "${P4_PATH}/modules-${custom_kernel_name}.tar.gz" ]; then
-        build_modules="modules-${custom_kernel_name}.tar.gz"
+    if  [ -f ${P4_PATH}/modules-${flippy_version}.tar.gz ]; then
+        build_modules="modules-${flippy_version}.tar.gz"
     else
         die "Have no modules-*.tar.gz file found in the ${P4_PATH} directory."
+		die "在 ${P4_PATH} 目录没有 modules-*.tar.gz 文件."
     fi
 
-    if [ -f "${P4_PATH}/header-${custom_kernel_name}.tar.gz" ]; then
-        build_header="header-${custom_kernel_name}.tar.gz"
-    else
-        build_header=""
-    fi
+    echo -e " \
+    Try to using this files to update the kernel: \n \
+    boot: ${build_boot} \n \
+    dtb: ${build_dtb} \n \
+    modules: ${build_modules} \n \
+    flippy_version: ${flippy_version} \n \
+    kernel_version: ${kernel_version} \n \
+    K510: ${K510}"
+
 else
-    die "Please upload the kernel files to [ ${P4_PATH} ], then run [ $0 ] again."
+    echo -e "Please upload the kernel files to [ ${P4_PATH} ], then run [ $0 ] again."
+	echo -e "上传内核文件到 [ ${P4_PATH} ] 目录,再执行 [ $0 ] ."
+    exit 1
 fi
 
 MODULES_OLD=$(ls /lib/modules/ 2>/dev/null)
 VERSION_OLD=$(echo ${MODULES_OLD} | grep -oE '^[1-9].[0-9]{1,3}' 2>/dev/null)
 VERSION_ver=${VERSION_OLD%%.*}
 VERSION_maj=${VERSION_OLD##*.}
-if [ ${VERSION_ver} -eq "5" ]; then
-    if [ "${VERSION_maj}" -ge "10" ]; then
+if  [ ${VERSION_ver} -eq "5" ]; then
+    if  [ "${VERSION_maj}" -ge "10" ]; then
         V510=1
     else
         V510=0
@@ -223,38 +212,47 @@ fi
 # Check version consistency
 if [ "${V510}" -lt "${K510}" ]; then
     echo -e "Update to kernel 5.10 or higher and install U-BOOT."
+	echo -e "升级内核版本 5.10 或更高并安装 U-BOOT."
 
     # Check ${UBOOT_OVERLOAD}
     if [[ -n "${UBOOT_OVERLOAD}" ]]; then
         if [[ ! -s "/boot/${UBOOT_OVERLOAD}" ]]; then
             echo -e "Try to download the ${UBOOT_OVERLOAD} file from the server."
+			echo -e "尝试从服务器下载 ${UBOOT_OVERLOAD} 文件."
             GITHUB_UBOOT_OVERLOAD="${GITHUB_RAW}/amlogic-u-boot/${UBOOT_OVERLOAD}"
             #echo -e "UBOOT_OVERLOAD: ${GITHUB_UBOOT_OVERLOAD}"
             wget -c "${GITHUB_UBOOT_OVERLOAD}" -O "/boot/${UBOOT_OVERLOAD}" >/dev/null 2>&1 && sync
             if [[ "$?" -eq "0" && -s "/boot/${UBOOT_OVERLOAD}" ]]; then
                 echo -e "The ${UBOOT_OVERLOAD} file download is complete."
+				echo -e "${UBOOT_OVERLOAD} 文件下载成功."
             else
                 die "The ${UBOOT_OVERLOAD} file download failed. please try again."
+				die "${UBOOT_OVERLOAD} 文件下载失败。再试一次."
             fi
         else
             echo -e "The ${UBOOT_OVERLOAD} file has been found."
+			echo -e "${UBOOT_OVERLOAD} 文件已加载."
         fi
     else
         die "The 5.10 kernel cannot be used without UBOOT_OVERLOAD."
+		die "没有UBOOT_OVERLOAD, 5.10 内核无法加载."
     fi
 
     # Check ${MAINLINE_UBOOT}
     if [[ -n "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
         if [[ ! -s "${MAINLINE_UBOOT}" ]]; then
             echo -e "Try to download the MAINLINE_UBOOT file from the server."
+			echo -e "正在从服务器下载 MAINLINE_UBOOT 文件."
             GITHUB_MAINLINE_UBOOT="${GITHUB_RAW}/common-files/files/usr${MAINLINE_UBOOT}"
             #echo -e "MAINLINE_UBOOT: ${GITHUB_MAINLINE_UBOOT}"
             [ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
             wget -c "${GITHUB_MAINLINE_UBOOT}" -O "${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
             if [[ "$?" -eq "0" && -s "${MAINLINE_UBOOT}" ]]; then
                 echo -e "The MAINLINE_UBOOT file download is complete."
+				echo -e "MAINLINE_UBOOT 文件下载再成功."
             else
                 die "The MAINLINE_UBOOT file download failed. please try again."
+				die "MAINLINE_UBOOT 文件下载失败。再试重试."
             fi
         fi
     fi
@@ -264,32 +262,37 @@ if [ "${V510}" -lt "${K510}" ]; then
         cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
         cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
         echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+		echo -e "${UBOOT_OVERLOAD} 文件拷贝成功."
     else
         die "The UBOOT_OVERLOAD file is missing and cannot be update."
+		die "UBOOT_OVERLOAD 文件丢失，无法更新."
     fi
 
     # Write Mainline bootloader
     if [[ -f "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
-        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ] to [ /dev/${EMMC_NAME} ]"
+        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ] 到 [ /dev/${EMMC_NAME} ]"
+		echo -e "写入引导程序: [ ${MAINLINE_UBOOT} ] to [ /dev/${EMMC_NAME} ]"
         dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=1 count=442 conv=fsync
         dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=512 skip=1 seek=1 conv=fsync
         echo -e "The MAINLINE_UBOOT file write is complete."
+		echo -e "MAINLINE_UBOOT 文件写入成功."
     fi
 fi
 
-echo -e "Unpack [ ${custom_kernel_name} ] related files ..."
+echo -e "Unpack [ ${flippy_version} ] related files ..."
+echo -e "解压 [ ${flippy_version} ] 相关文件 ..."
 
 # 01. for /boot five files
 rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-* 2>/dev/null && sync
 rm -f /boot/uInitrd /boot/zImage 2>/dev/null && sync
 tar -xzf ${P4_PATH}/${build_boot} -C /boot && sync
 
-if [[ -f "/boot/uInitrd-${custom_kernel_name}" ]]; then
+if [[ -f "/boot/uInitrd-${flippy_version}" ]]; then
     i=1
     max_try=10
     while [ "${i}" -le "${max_try}" ]; do
-        cp -f /boot/uInitrd-${custom_kernel_name} /boot/uInitrd 2>/dev/null && sync
-        uInitrd_original=$(md5sum /boot/uInitrd-${custom_kernel_name} | awk '{print $1}')
+        cp -f /boot/uInitrd-${flippy_version} /boot/uInitrd 2>/dev/null && sync
+        uInitrd_original=$(md5sum /boot/uInitrd-${flippy_version} | awk '{print $1}')
         uInitrd_new=$(md5sum /boot/uInitrd | awk '{print $1}')
         if [[ "${uInitrd_original}" == "${uInitrd_new}" ]]; then
             break
@@ -299,17 +302,18 @@ if [[ -f "/boot/uInitrd-${custom_kernel_name}" ]]; then
             continue
         fi
     done
-    [ "${i}" -eq "10" ] && die "/boot/uInitrd-${custom_kernel_name} file copy failed."
+    [ "${i}" -eq "10" ] && die "/boot/uInitrd-${flippy_version} file copy failed."
 else
-    die "/boot/uInitrd-${custom_kernel_name} file is missing."
+    die "/boot/uInitrd-${flippy_version} file is missing."
+	die "/boot/uInitrd-${flippy_version} 文件丢失."
 fi
 
-if [[ -f "/boot/vmlinuz-${custom_kernel_name}" ]]; then
+if [[ -f "/boot/vmlinuz-${flippy_version}" ]]; then
     i=1
     max_try=10
     while [ "${i}" -le "${max_try}" ]; do
-        cp -f /boot/vmlinuz-${custom_kernel_name} /boot/zImage 2>/dev/null && sync
-        vmlinuz_original=$(md5sum /boot/vmlinuz-${custom_kernel_name} | awk '{print $1}')
+        cp -f /boot/vmlinuz-${flippy_version} /boot/zImage 2>/dev/null && sync
+        vmlinuz_original=$(md5sum /boot/vmlinuz-${flippy_version} | awk '{print $1}')
         vmlinuz_new=$(md5sum /boot/zImage | awk '{print $1}')
         if [[ "${vmlinuz_original}" == "${vmlinuz_new}" ]]; then
             break
@@ -319,52 +323,49 @@ if [[ -f "/boot/vmlinuz-${custom_kernel_name}" ]]; then
             continue
         fi
     done
-    [ "${i}" -eq "10" ] && die "/boot/vmlinuz-${custom_kernel_name} file copy failed."
+    [ "${i}" -eq "10" ] && die "/boot/vmlinuz-${flippy_version} file copy failed."
 else
-    die "/boot/vmlinuz-${custom_kernel_name} file is missing."
+    die "/boot/vmlinuz-${flippy_version} file is missing."
+	die "/boot/vmlinuz-${flippy_version} 文件丢失."
 fi
 
-[ -f "/boot/config-${custom_kernel_name}" ] || die "/boot/config-${custom_kernel_name} file is missing."
-[ -f "/boot/System.map-${custom_kernel_name}" ] || die "/boot/System.map-${custom_kernel_name} file is missing."
+[ -f "/boot/config-${flippy_version}" ] || die "/boot/config-${flippy_version} file is missing."
+[ -f "/boot/System.map-${flippy_version}" ] || die "/boot/System.map-${flippy_version} file is missing."
 
 echo -e "02.01 Unpack [ ${build_boot} ] complete."
+echo -e "02.01 解压 [ ${build_boot} ] 文件成功."
 sleep 3
 
 # 02 for /boot/dtb/amlogic/*
 tar -xzf ${P4_PATH}/${build_dtb} -C /boot/dtb/amlogic && sync
-[ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ] || die "/boot/dtb/amlogic file is missing."
+[ "$( ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l )" -ge "10" ] || die "/boot/dtb/amlogic file is missing."
 echo -e "02.02 Unpack [ ${build_dtb} ] complete."
+echo -e "02.02 解压 [ ${build_dtb} ] 文件成功."
 sleep 3
 
 # 03 for /lib/modules/*
 rm -rf /lib/modules/* 2>/dev/null && sync
 tar -xzf ${P4_PATH}/${build_modules} -C /lib/modules && sync
-(cd /lib/modules/${custom_kernel_name} && echo "build source" | xargs rm -f)
-[[ -d "/lib/modules/${custom_kernel_name}" ]] || die "/lib/modules/${custom_kernel_name} kernel folder is missing."
+( cd /lib/modules/${flippy_version} && echo "build source" | xargs rm -f )
+[[ -d "/lib/modules/${flippy_version}" ]] || die "/lib/modules/${flippy_version} kernel folder is missing."
 echo -e "02.03 Unpack [ ${build_modules} ] complete."
+echo -e "02.03 解压 [ ${build_modules} ] 文件成功."
 sleep 3
 
-# 04 for /usr/local/include/*
-if [[ -n "${build_header}" && -f "${P4_PATH}/${build_header}" ]]; then
-    rm -rf /usr/local/include/* 2>/dev/null && sync
-    tar -xzf ${P4_PATH}/${build_header} -C /usr/local && sync
-    echo -e "02.04 Unpack [ ${build_header} ] complete."
-    sleep 3
-fi
-
-# Delete kernel files
-rm -f ${P4_PATH}/*${custom_kernel_name}*.tar.gz 2>/dev/null
+rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz 2>/dev/null
 
 # 04 Update
 sed -i '/KERNEL_VERSION/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "KERNEL_VERSION='${kernel_version}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "KERNEL_VERSION='${kernel_version}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
 sed -i '/K510/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "K510='${K510}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "K510='${K510}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
 
 sync
 wait
 
 echo "Successfully updated, automatic restarting..."
+echo "更新完毕，马上就会自动重启，不慌 ..."
 sleep 3
 reboot
 exit 0
+
