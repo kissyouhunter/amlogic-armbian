@@ -425,8 +425,8 @@ copy_files() {
     chown 0 usr/lib/sudo/sudoers.so
     chmod 644 usr/lib/sudo/sudoers.so
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    chmod 4755 etc/update-motd.d/10-armbian-header 2>/dev/null
-    chmod 4755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
+    chmod 755 etc/update-motd.d/10-armbian-header 2>/dev/null
+    chmod 755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
 
     # Delete related files
     rm -f etc/apt/sources.list.save 2>/dev/null
@@ -457,6 +457,11 @@ copy_files() {
     # Set interfaces macaddr
     interfaces_file="etc/network/interfaces"
     [ -f "${interfaces_file}" ] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
+
+    # Add rtl8189fs driver for s905x(HG680P & B860H), rtl8822cs driver for s905x3(x96max+) in the dev branch of the kernel repo
+    [[ "${build_soc}" == "s905x3" || "${build_soc}" == "s905x" ]] && {
+        sed -i "s|version_branch=\"stable\"|version_branch=\"dev\"|g" usr/sbin/armbian-update
+    }
 
     # Optimize wifi/bluetooth module
     [ -d "usr/lib/firmware/brcm" ] && (

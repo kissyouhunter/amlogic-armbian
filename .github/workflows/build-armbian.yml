@@ -16,7 +16,7 @@ on:
       set_board:
         description: "BOARD: lepotato / odroidn2"
         required: false
-        default: "lepotato"
+        default: "odroidn2"
       set_opts:
         description: "More build options: for compile.sh"
         required: false
