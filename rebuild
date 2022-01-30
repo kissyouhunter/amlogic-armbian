@@ -27,7 +27,7 @@ armbian_release_file="etc/armbian-release"
 # Add custom firmware information
 ophub_release_file="etc/ophub-release"
 
-kernel_repo="https://github.com/kissyouhunter/kernel_N1/tree/main/kernel"
+kernel_repo="https://github.com/kissyouhunter/kernel_N1/trunk/kernel"
 #kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch=""
 
