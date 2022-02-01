@@ -58,8 +58,7 @@ jobs:
           #if  [[ -z "${set_kernel}" || -z "$(echo "${ARR_KERNEL[@]}" | grep -w "${set_kernel}")" ]]; then
               #set_kernel="5.10.95"
           #fi
-          #echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV 
-          echo "ARMBIAN_KERNEL: ${{ github.event.inputs.set_kernel }}" >> $GITHUB_ENV 
+          echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
 
       - name: telegrame_bot
         run: |
