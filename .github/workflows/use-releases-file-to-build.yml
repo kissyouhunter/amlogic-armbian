@@ -37,18 +37,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Initialization environment
-        env:
-          DEBIAN_FRONTEND: noninteractive
+      - name: choose kernel
         run: |
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
-          sudo timedatectl set-timezone "$TZ"
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
-
           ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
@@ -68,7 +58,7 @@ jobs:
           if  [[ -z "${set_kernel}" || -z "$(echo "${ARR_KERNEL[@]}" | grep -w "${set_kernel}")" ]]; then
               set_kernel="5.10.95"
           fi
-          echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV   
+          echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV 
 
       - name: telegrame_bot
         run: |
@@ -76,6 +66,18 @@ jobs:
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
             您正在使用kissyouhunter仓库的Armbian_22.02.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi 
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
