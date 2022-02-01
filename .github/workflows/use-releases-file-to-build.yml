@@ -53,7 +53,7 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV         
 
-          ARR_KERNEL=("5.4.y" "5.10.y" "5.15.y")
+          #ARR_KERNEL=("5.4.175" "5.10.95" "5.15.18")
           set_kernel="${{ github.event.inputs.set_kernel }}"
           if  [[ -z "${set_kernel}" || -z "$(echo "${ARR_KERNEL[@]}" | grep -w "${set_kernel}")" ]]; then
               set_kernel="5.10.95"
