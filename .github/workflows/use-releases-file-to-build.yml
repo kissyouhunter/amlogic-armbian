@@ -100,6 +100,7 @@ jobs:
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
           cd ${GITHUB_WORKSPACE}
+          sudo chmod +x build-armbian/common-files/files/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
           cd ./build/output/images && rm -f Armbian_22.02.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img &&sudo gzip *.img && sync
