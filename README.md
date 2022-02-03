@@ -10,6 +10,4 @@
 
 * 下载跳转[github](https://github.com/kissyouhunter/Openwrt_X86-Openwrt_N1-Armbian_N1/releases/tag/Armbian) [国内](http://tt.kisssik.ga)
 
-
-
 FORK FROM [ophub](https://github.com/ophub/amlogic-s9xxx-armbian)
