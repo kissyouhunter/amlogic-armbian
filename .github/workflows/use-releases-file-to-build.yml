@@ -106,7 +106,11 @@ jobs:
           cd ${GITHUB_WORKSPACE}
           sudo chmod +x build-armbian/common-files/files/usr/sbin/*
           sudo chmod +x rebuild
-          sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
+          if [ "$set_kernel" = "none" ]; then
+            echo "no kernel was chosen"
+          else
+            sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
+          fi
           cd ./build/output/images && rm -f Armbian_22.02.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img &&sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
