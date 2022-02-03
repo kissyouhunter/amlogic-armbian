@@ -8,5 +8,8 @@
 
 * 常用命令armbian-config（配置ip、cpu等配置）; armbian-install（安装到emmc）; armbian-docker （一键安装docker）；armbian-update（更新内核）；armbian-container（一键安装常用docker容器）。
 
+* 下载[跳转](https://github.com/ophub/amlogic-s9xxx-armbian) [国内](http://tt.kisssik.ga)
 
+
+https://github.com/kissyouhunter/Openwrt_X86-Openwrt_N1-Armbian_N1/releases/tag/Armbian
 FORK FROM [ophub](https://github.com/ophub/amlogic-s9xxx-armbian)
