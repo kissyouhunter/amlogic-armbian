@@ -23,7 +23,7 @@ on:
         default: "none"
 env:
   TZ: Asia/Shanghai
-  BASE_KERNEL: 5.10.96
+  BASE_KERNEL: 5.10.101
   UPLOAD_FIRMWARE: true
   SERVERCHAN_SCKEY: true
 
