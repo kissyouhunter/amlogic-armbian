@@ -368,4 +368,3 @@ echo "更新完毕，马上就会自动重启，不慌 ..."
 sleep 3
 reboot
 exit 0
-

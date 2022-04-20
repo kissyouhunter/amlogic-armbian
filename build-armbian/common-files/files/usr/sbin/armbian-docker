@@ -1,13 +1,4 @@
 #!/bin/bash
-#=========================================================================
-# Function: Install docker to armbian
-# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-
-# Command: armbian-docker
-#=========================================================================
-
-# Set font color#!/bin/bash
 ## Author: SuperManito
 ## Modified: 2021-12-15
 ## License: GPL-2.0
@@ -51,7 +42,7 @@ DockerVersionFile=docker-version.txt
 DockerCEVersionFile=docker-ce-version.txt
 DockerCECLIVersionFile=docker-ce-cli-version.txt
 PROXY_URL=https://ghproxy.com/
-DOCKER_COMPOSE_VERSION=v2.2.3
+DOCKER_COMPOSE_VERSION=v2.4.1
 DOCKER_COMPOSE_DOWNLOAD_URL=https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-x86_64
 DOCKER_COMPOSE_AARCG64_DOWNLOAD_URL=https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-aarch64
 
@@ -273,8 +264,13 @@ function ConfigureDockerCEMirror() {
         apt-get update >/dev/null 2>&1
         ;;
     RedHat)
-        yum-config-manager -y --add-repo https://${SOURCE_JUDGMENT}/linux/${SOURCE_BRANCH}/docker-ce.repo
-        yum makecache >/dev/null 2>&1
+        if [ ${SOURCE_BRANCH} == almali ] || [ ${SOURCE_BRANCH} == rockyl ]; then
+            yum-config-manager -y --add-repo https://${SOURCE_JUDGMENT}/linux/centos/docker-ce.repo
+            yum makecache >/dev/null 2>&1
+        else
+            yum-config-manager -y --add-repo https://${SOURCE_JUDGMENT}/linux/${SOURCE_BRANCH}/docker-ce.repo
+            yum makecache >/dev/null 2>&1
+        fi
         ;;
     esac
 }
@@ -544,7 +540,7 @@ function ChooseMirrors() {
     echo -e ''
     echo -e "        运行环境  ${SYSTEM_NAME} ${SYSTEM_VERSION_NUMBER} ${SYSTEM_ARCH}"
     echo -e "        系统时间  $(date "+%Y-%m-%d %H:%M:%S")"
-    echo -e ''
+    echo -e '                ctrl+c退出安装'
     echo -e '#####################################################'
     CHOICE_A=$(echo -e "\n${BOLD}└ 请选择并输入你想使用的 Docker CE 源 [ 1~8 ]：${PLAIN}")
     read -p "${CHOICE_A}" INPUT
