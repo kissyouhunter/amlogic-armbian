@@ -20,7 +20,7 @@ tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
-# get VERSION_CODENAME: such as [ focal ]
+# get VERSION_CODENAME: such as [ jammy ]
 os_release_file="etc/os-release"
 # set BOARD_NAME: such as [ s905x3 ]
 armbian_release_file="etc/armbian-release"
@@ -120,7 +120,7 @@ make_image() {
     fi
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_focal_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_jammy_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file}
     sync
 
@@ -377,8 +377,8 @@ copy_files() {
     fi
     #
     # Copy the different files of the release for ROOTFS: ubuntu and debian
-    armbian_ubuntu=("bionic" "focal" "hirsute")
-    armbian_debian=("bullseye" "buster" "stretch")
+    armbian_ubuntu=("jammy" "focal")
+    armbian_debian=("bullseye" "buster")
     release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
     [ -z "${release_codename}" ] && error_msg "RELEASE CODENAME is invalid."
     diff_release_files="${configfiles_path}/release/${release_codename}"
@@ -516,7 +516,7 @@ copy_files() {
 clean_tmp() {
     cd ${tmp_outpath}
     # Rename version
-    [[ "${release_codename}" != "focal" ]] && rename "s/focal/${release_codename}/g" *.img 2>/dev/null && sync
+    [[ "${release_codename}" != "jammy" ]] && rename "s/jammy/${release_codename}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
     sync
 
