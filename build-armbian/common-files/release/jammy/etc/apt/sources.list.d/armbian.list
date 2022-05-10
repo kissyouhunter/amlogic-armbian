@@ -1,1 +1,2 @@
-deb https://mirrors.aliyun.com/armbian/ jammy main jammy-utils jammy-desktop
+#deb https://mirrors.aliyun.com/armbian/ jammy main jammy-utils jammy-desktop
+deb [signed-by=/usr/share/keyrings/armbian.gpg] http://apt.armbian.com jammy main jammy-utils jammy-desktop
