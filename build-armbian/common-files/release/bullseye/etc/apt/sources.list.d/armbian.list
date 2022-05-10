@@ -1,1 +1,1 @@
-deb https://mirrors.tuna.tsinghua.edu.cn/armbian/ bullseye main bullseye-utils bullseye-desktop
+deb http://mirrors.aliyun.com/armbian/ bullseye main bullseye-utils bullseye-desktop
