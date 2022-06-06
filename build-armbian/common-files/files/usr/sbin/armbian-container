@@ -24,8 +24,10 @@ V2P_PORT=8100
 V2P_PORT1=8101
 V2P_PORT2=8102
 # emby变量
-EMBY_DOCKER_IMG_NAME="xanderye/embyserver"
-EMBY_TAG="4.7.0.20"
+#EMBY_DOCKER_IMG_NAME="xanderye/embyserver"
+#EMBY_TAG="4.7.0.32"
+EMBY_DOCKER_IMG_NAME="xinjiawei1/emby_unlockd"
+EMBY_TAG="latest"
 EMBY_PATH=""
 EMBY_CONFIG_FOLDER=$(pwd)/emby
 EMBY_MOVIES_FOLDER=$(pwd)/movies
@@ -81,6 +83,7 @@ ADG_CONTAINER_NAME=""
 # x-ui变量
 XUI_DOCKER_IMG_NAME="kissyouhunter/x-ui"
 TAG="latest"
+DEV="dev"
 XUI_PATH=""
 XUI_CONFIG_FOLDER=$(pwd)/x-ui
 XUI_CONTAINER_NAME=""
@@ -91,6 +94,14 @@ AAPANEL_PATH=""
 AAPANEL_CONFIG_FOLDER=$(pwd)/aapanel
 N1_AAPANEL_FOLDER=/mnt/mmcblk2p4/aapanel
 AAPANEL_CONTAINER_NAME=""
+# MaiARK 变量
+MAIARK_DOCKER_IMG_NAME="kissyouhunter/maiark"
+MAIARK_TAG_AMD="amd64"
+MAIARK_TAG_ARM="arm64"
+MAIARK_PATH=""
+MAIARK_CONFIG_FOLDER=$(pwd)/MaiARK
+N1_MAIARK_FOLDER=/mnt/mmcblk2p4/MarARK
+MAIARK_CONTAINER_NAME=""
 
 log() {
     echo -e "\n$1"
@@ -146,9 +157,10 @@ TIME w "(7) TG定时发送信息工具"
 TIME w "(8) AdGuardHome DNS解析+去广告"
 TIME w "(9) x-ui"
 TIME w "(10) aaPanel(宝塔国际版)"
+TIME w "(11) MaiARK(对接青龙提交京东CK)"
 TIME r "(0) 不想安装了，给老子退出！！！"
 #EOF
-read -p "Please enter your choice[0-10]: " input
+read -p "Please enter your choice[0-11]: " input
 case $input in
 #安装docker and docker-compose
 1)
@@ -193,10 +205,10 @@ TIME l "<注>openwrt宿主机默认安装dockerman图形docker管理工具！"
  3)
     TIME y " >>>>>>>>>>>开始为Arm64 openwrt安装docker和docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://tt.kisssik.ga/d/aliyun/files/docker-20.10.12-1_aarch64.zip
-    unzip docker-20.10.12-1_aarch64.zip && rm -f docker-20.10.12-1_aarch64.zip
-    cd /tmp/upload/docker-20.10.12-1_aarch64 && opkg install *.ipk
-    cd /tmp/upload && rm -rf docker-20.10.12-1_aarch64/
+    curl -LO https://tt.kisssik.ga/d/aliyun/files/docker-20.10.15-1_aarch64.zip
+    unzip docker-20.10.15-1_aarch64.zip && rm -f docker-20.10.15-1_aarch64.zip
+    cd /tmp/upload/docker-20.10.15-1_aarch64 && opkg install *.ipk
+    cd /tmp/upload && rm -rf docker-20.10.15-1_aarch64/
     docker -v && docker-compose -v
     TIME g "****docker安装完成，请返回上级菜单!****"
     TIME g "****U盘上运行的OP，如果docker空间没有指定到 /mnt/sda4/docker ，请修改****"
@@ -297,7 +309,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   TIME w "请根据提示驶入对应内容。"
   TIME w "目前提供的版本有如下："
   TIME w "2.10、2.10.6、2.10.7、2.10.8、2.10.9、2.10.10、2.10.11、2.10.12、2.10.13"
-  TIME w "2.11.0、2.11.1、2.11.2.2.11.3和最新"
+  TIME w "2.11.0、2.11.1、2.11.2.2.11.3"
+  TIME w "2.12.0、2.12.1、2.12.2"
+  TIME w "2.13.0、2.13.1、2.13.2和最新"
   echo -n -e "请输入版本号（回车默认为最新版本）: "
   read ql_version
   if [ -z "$ql_version" ]; then
@@ -436,7 +450,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   }
 
   input_container_ql1_judge() {
-  if [ $TAG == latest ]; then
+  if [ $TAG == latest ] || [ $TAG == "2.12" ] || [ $TAG == "2.12.0" ] || [ $TAG == "2.12.1" ] || [ $TAG == "2.12.2" ] || [ $TAG == "2.13" ] || [ $TAG == "2.13.0" ] || [ $TAG == "2.13.1" ]; then
       input_container_ql1_config1
       input_container_ql1_name
       input_container_ql1_network_config
@@ -525,7 +539,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   TIME w "请根据提示驶入对应内容。"
   TIME w "目前提供的版本有如下："
   TIME w "2.10、2.10.6、2.10.7、2.10.8、2.10.9、2.10.10、2.10.11、2.10.12、2.10.13"
-  TIME w "2.11.0、2.11.1、2.11.2.2.11.3和最新"
+  TIME w "2.11.0、2.11.1、2.11.2.2.11.3"
+  TIME w "2.12.0、2.12.1、2.12.2"
+  TIME w "2.13.0、2.13.1、2.13.2和最新"
   echo -n -e "请输入版本号（回车默认为最新版本）: "
   read ql_version
   if [ -z "$ql_version" ]; then
@@ -1040,6 +1056,7 @@ TIME w "|********** PORTAINER & YACHT *********|"
 TIME w "----------------------------------------"
 TIME w "(1) 安装portianer"
 TIME w "(2) 安装yacht"
+TIME w "(3) 安装simpledocker 中文"
 TIME b "(0) 返回上级菜单"
 #EOF
  read -p "Please enter your Choice[0-2]: " input4
@@ -1075,6 +1092,23 @@ TIME b "(0) 返回上级菜单"
     TIME g "|              安装完成，自动退出脚本                |"
     TIME g "|       默认账号：admin@yacht.local 密码：pass       |"
     TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:8008)    |"
+    TIME g "------------------------------------------------------"
+  exit 0  
+  ;;
+ 3)
+    TIME y " >>>>>>>>>>>开始安装simpledocker"
+    cd /tmp && curl -Lo docker-compose.yml https://raw.githubusercontent.com/kissyouhunter/Tools/main/simpledocker-docker-compose.yml
+    docker-compose up -d    
+    if [ $? -ne 0 ] ; then
+        cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
+    fi
+
+    TIME g "------------------------------------------------------"
+    TIME g "|     simpledocker启动需要一点点时间，请耐心等待！   |"
+    sleep 10
+    TIME g "|              安装完成，自动退出脚本                |"
+    TIME g "|           默认账号：admin 密码：123456             |"
+    TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:9009)    |"
     TIME g "------------------------------------------------------"
   exit 0  
   ;;
@@ -1121,7 +1155,7 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|*********** EMBY & JELLYFIN **********|"
 TIME w "----------------------------------------"
-TIME w "(1) 安装emby (暂无arm64)"
+TIME w "(1) 安装emby (开心版暂无arm64)"
 TIME w "(2) 安装jellyfin"
 TIME b "(0) 返回上级菜单"
 #EOF
@@ -1292,7 +1326,7 @@ TIME r "<注>请使用root账户部署容器"
     TIME y " >>>>>>>>>>>开始安装jellyfin"
   # 创建映射文件夹
   input_container_jellyfin_config() {
-  echo -n -e "请输入emby配置文件保存的绝对路径（示例：/home/jellyfin)，回车默认为当前目录: "
+  echo -n -e "请输入jellyfin配置文件保存的绝对路径（示例：/home/jellyfin)，回车默认为当前目录: "
   read jellyfin_path
   if [ -z "$jellyfin_path" ]; then
       JELLYFIN_PATH=$JELLYFIN_CONFIG_FOLDER
@@ -1603,7 +1637,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   echo -n -e "请输入下载文件保存的绝对路径（示例：/home/downloads)，回车默认为当前目录: "
   read downloads_path
   if [ -z "$downloads_path" ]; then
-      DOWNLOADS_PATH=$QB_DOWNLOADS_FOLDER
+      DOWNLOADS_PATH=$ARIA2_DOWNLOADS_FOLDER
   elif [ -d "$downloads_path" ]; then
       DOWNLOADS_PATH=$downloads_path
   else
@@ -1664,7 +1698,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
 
   TIME y " >>>>>>>>>>>配置完成，开始安装aria2"
   log "1.开始创建配置文件目录"
-  PATH_LIST=($CONFIG_PATH $MOVIES_PATH $TVSHOWS_PATH)
+  PATH_LIST=($ARIA2_PATH $DOWNLOADS_PATH)
   for i in ${PATH_LIST[@]}; do
       mkdir -p $i
   done
@@ -1727,7 +1761,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   echo -n -e "请输入下载文件保存的绝对路径（示例：/home/downloads)，回车默认为当前目录: "
   read downloads_path
   if [ -z "$downloads_path" ]; then
-      DOWNLOADS_PATH=$QB_DOWNLOADS_FOLDER
+      DOWNLOADS_PATH=$ARIA2_PRO_DOWNLOADS_FOLDER
   elif [ -d "$downloads_path" ]; then
       DOWNLOADS_PATH=$downloads_path
   else
@@ -1800,7 +1834,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
 
   TIME y " >>>>>>>>>>>配置完成，开始安装aria2-pro"
   log "1.开始创建配置文件目录"
-  PATH_LIST=($CONFIG_PATH $MOVIES_PATH $TVSHOWS_PATH)
+  PATH_LIST=($ARIA2_PRO_PATH $DOWNLOADS_PATH)
   for i in ${PATH_LIST[@]}; do
       mkdir -p $i
   done
@@ -2337,11 +2371,26 @@ TIME b "(0) 返回上级菜单"
   }
   input_container_xui_name
 
+  # image 版本
+  input_container_xui_image() {
+    echo -n -e "请输入将要拉取镜像[默认为：最新版本latest，输入dev为尝鲜版]-> "
+    read image_name
+    if [ -z "$image_name" ]; then
+        XUI_IMAGE_NAME="latest"
+    elif [ "$image_name" == "latest" ]; then
+        XUI_IMAGE_NAME="latest"
+    else
+        XUI_IMAGE_NAME=$DEV
+    fi
+  }
+  input_container_xui_image
+
   # 确认
   while true
   do
   	TIME y "x-ui 配置文件路径：$CONFIG_PATH"
   	TIME y "x-ui 容器名：$XUI_CONTAINER_NAME"
+    TIME y "x-ui 镜像版本：$XUI_IMAGE_NAME"
   	read -r -p "以上信息是否正确？[Y/n] " input91
   	case $input91 in
   		[yY][eE][sS]|[yY])
@@ -2352,6 +2401,7 @@ TIME b "(0) 返回上级菜单"
   			sleep 1
   			input_container_xui_config
   			input_container_xui_name
+            input_container_xui_image
   			;;
   		*)
   			TIME r "输入错误，请输入[Y/n]"
@@ -2375,7 +2425,7 @@ TIME b "(0) 返回上级菜单"
       --hostname $XUI_CONTAINER_NAME \
       --restart always \
       --net host \
-      $XUI_DOCKER_IMG_NAME:$TAG
+      $XUI_DOCKER_IMG_NAME:$XUI_IMAGE_NAME
 
       if [ $? -ne 0 ] ; then
           cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
@@ -2622,6 +2672,293 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "|            访问方式为 宿主机ip:8888/aapanel/            |"
     TIME g "|        默认账号：aapanel  默认密码：aapanel123          |"
     TIME g "|   基础教程 https://wiki.991231.xyz/zh/docker/aapanel    |"
+    TIME g "-----------------------------------------------------------"
+  exit 0
+  ;;
+ 0) 
+ clear 
+ break
+ ;;
+ *) TIME r "----------------------------------"
+    TIME r "|          Warning!!!            |"
+    TIME r "|       请输入正确的选项!        |"
+    TIME r "----------------------------------"
+ for i in $(seq -w 1 -1 1)
+   do
+     #TIME r "\b\b$i";
+     sleep 1;
+   done
+ clear
+ ;;
+ esac
+ done
+;;
+#安装MaiARK
+11)
+clear
+while [ "$flag" -eq 0 ]
+do
+#cat << EOF
+TIME w "----------------------------------------"
+TIME w "|****Please Enter Your Choice:[0-3]****|"
+TIME w "|************** MaiARK ****************|"
+TIME w "----------------------------------------"
+TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
+TIME w "(2) ARM CPU的linux系统、各种盒子的openwrt等请选择 2"
+TIME w "(3) N1的EMMC上运行的openwrt请选择 3"
+TIME b "(0) 返回上级菜单"
+#EOF
+TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车！"
+ read -p "Please enter your choice[0-3]: " input11
+ case $input11 in 
+ 1)
+  TIME y " >>>>>>>>>>>开始安装MaiARK (AMD64 CPU)"
+  # 创建映射文件夹
+  input_container_maiark1_config() {
+  echo -n -e "请输入MaiARK配置文件保存的绝对路径（示例：/home/MaiARK)，回车默认为当前目录: "
+  read maiark_path
+  if [ -z "$maiark_path" ]; then
+      MAIARK_PATH=$MAIARK_CONFIG_FOLDER
+  elif [ -d "$maiark_path" ]; then
+      MAIARK_PATH=$maiark_path
+  else
+      MAIARK_PATH=$maiark_path
+  fi
+  CONFIG_PATH=$MAIARK_PATH
+  }
+  input_container_maiark1_config
+
+  # 输入容器名
+  input_container_maiark1_name() {
+    echo -n -e "请输入将要创建的容器名[默认为：maiark]-> "
+    read container_name
+    if [ -z "$container_name" ]; then
+        MAIARK_CONTAINER_NAME="maiark"
+    else
+        MAIARK_CONTAINER_NAME=$container_name
+    fi
+  }
+  input_container_maiark1_name
+
+  # 确认
+  while true
+  do
+  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
+  	TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
+  	read -r -p "以上信息是否正确？[Y/n] " input111
+  	case $input111 in
+  		[yY][eE][sS]|[yY])
+  			break
+  			;;
+  		[nN][oO]|[nN])
+  			TIME w "即将返回上一步"
+  			sleep 1
+  			input_container_maiark1_config
+  			input_container_maiark1_name
+  			;;
+  		*)
+  			TIME r "输入错误，请输入[Y/n]"
+  			;;
+  	esac
+  done
+
+  TIME y " >>>>>>>>>>>配置完成，开始安装MaiARK"
+  log "1.开始创建配置文件目录"
+  PATH_LIST=($CONFIG_PATH)
+  for i in ${PATH_LIST[@]}; do
+      mkdir -p $i
+  done
+
+  log "2.开始创建容器并执行"
+  docker run -d \
+      -v $CONFIG_PATH:/MaiARK \
+      --name $MAIARK_CONTAINER_NAME \
+      --hostname $MAIARK_CONTAINER_NAME \
+      --restart always \
+      --net host \
+      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_AMD
+
+      if [ $? -ne 0 ] ; then
+          cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
+      fi
+
+      log "列出所有宿主机上的容器"
+      docker ps -a
+    TIME g "-----------------------------------------------------------"
+    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
+    sleep 10
+    TIME g "|                安装完成，自动退出脚本                   |"
+    TIME g "|               访问方式为 宿主机ip:8082                  |"
+    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
+    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
+    TIME g "-----------------------------------------------------------"
+  exit 0
+  ;;
+ 2)
+  TIME y " >>>>>>>>>>>开始安装MaiARK (ARM64 CPU)"
+  # 创建映射文件夹
+  input_container_maiark2_config() {
+  echo -n -e "请输入MaiARK配置文件保存的绝对路径（示例：/home/MaiARK)，回车默认为当前目录: "
+  read maiark_path
+  if [ -z "$maiark_path" ]; then
+      MAIARK_PATH=$MAIARK_CONFIG_FOLDER
+  elif [ -d "$maiark_path" ]; then
+      MAIARK_PATH=$maiark_path
+  else
+      MAIARK_PATH=$maiark_path
+  fi
+  CONFIG_PATH=$MAIARK_PATH
+  }
+  input_container_maiark2_config
+
+  # 输入容器名
+  input_container_maiark2_name() {
+    echo -n -e "请输入将要创建的容器名[默认为：maiark]-> "
+    read container_name
+    if [ -z "$container_name" ]; then
+        MAIARK_CONTAINER_NAME="maiark"
+    else
+        MAIARK_CONTAINER_NAME=$container_name
+    fi
+  }
+  input_container_maiark2_name
+
+  # 确认
+  while true
+  do
+  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
+  	TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
+  	read -r -p "以上信息是否正确？[Y/n] " input111
+  	case $input111 in
+  		[yY][eE][sS]|[yY])
+  			break
+  			;;
+  		[nN][oO]|[nN])
+  			TIME w "即将返回上一步"
+  			sleep 1
+  			input_container_maiark2_config
+  			input_container_maiark2_name
+  			;;
+  		*)
+  			TIME r "输入错误，请输入[Y/n]"
+  			;;
+  	esac
+  done
+
+  TIME y " >>>>>>>>>>>配置完成，开始安装MaiARK"
+  log "1.开始创建配置文件目录"
+  PATH_LIST=($CONFIG_PATH)
+  for i in ${PATH_LIST[@]}; do
+      mkdir -p $i
+  done
+
+  log "2.开始创建容器并执行"
+  docker run -dit \
+      -t \
+      -v $CONFIG_PATH:/MaiARK \
+      --name $MAIARK_CONTAINER_NAME \
+      --hostname $MAIARK_CONTAINER_NAME \
+      --restart always \
+      --net host \
+      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
+
+      if [ $? -ne 0 ] ; then
+          cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
+      fi
+
+      log "列出所有宿主机上的容器"
+      docker ps -a
+    TIME g "-----------------------------------------------------------"
+    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
+    sleep 10
+    TIME g "|                安装完成，自动退出脚本                   |"
+    TIME g "|               访问方式为 宿主机ip:8082                  |"
+    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
+    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
+    TIME g "-----------------------------------------------------------"
+  exit 0
+  ;;
+ 3)  
+  TIME y " >>>>>>>>>>>开始安装MaiARK到N1的/mnt/mmcblk2p4/"
+  # 创建映射文件夹
+  input_container_maiark3_config() {
+  echo -n -e "请输入MaiARK存储的文件夹名称（如：MaiARK)，回车默认为 MaiARK: "
+  read maiark_path
+  if [ -z "$maiark_path" ]; then
+      MAIARK_PATH=$N1_MAIARK_FOLDER
+  elif [ -d "$maiark_path" ]; then
+      MAIARK_PATH=/mnt/mmcblk2p4/$maiark_path
+  else
+      MAIARK_PATH=/mnt/mmcblk2p4/$maiark_path
+  fi
+  CONFIG_PATH=$MAIARK_PATH
+  }
+  input_container_maiark3_config
+  
+  # 输入容器名
+  input_container_maiark3_name() {
+    echo -n -e "请输入将要创建的容器名[默认为：maiark]-> "
+    read container_name
+    if [ -z "$container_name" ]; then
+        MAIARK_CONTAINER_NAME="maiark"
+    else
+        MAIARK_CONTAINER_NAME=$container_name
+    fi
+  }
+  input_container_maiark3_name
+
+  # 确认
+  while true
+  do
+  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
+  	TIME y "MaiARK 容器名：$MAIARK_CONTAINER_NAME"
+  	read -r -p "以上信息是否正确？[Y/n] " input113
+  	case $input113 in
+  		[yY][eE][sS]|[yY])
+  			break
+  			;;
+  		[nN][oO]|[nN])
+  			TIME w "即将返回上一步"
+  			sleep 1
+  			input_container_maiark3_config
+  			input_container_maiark3_name
+  			;;
+  		*)
+  			TIME r "输入错误，请输入[Y/n]"
+  			;;
+  	esac
+  done
+
+  TIME y " >>>>>>>>>>>配置完成，开始安装MaiARK"
+  log "1.开始创建配置文件目录"
+  PATH_LIST=($CONFIG_PATH)
+  for i in ${PATH_LIST[@]}; do
+      mkdir -p $i
+  done
+
+  log "3.开始创建容器并执行"
+  docker run -dit \
+      -t \
+      -v $CONFIG_PATH:/MaiARK \
+      --name $MAIARK_CONTAINER_NAME \
+      --hostname $MAIARK_CONTAINER_NAME \
+      --restart always \
+      --net host \
+      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
+
+      if [ $? -ne 0 ] ; then
+          cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
+      fi
+
+      log "列出所有宿主机上的容器"
+      docker ps -a
+    TIME g "-----------------------------------------------------------"
+    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
+    sleep 10
+    TIME g "|                安装完成，自动退出脚本                   |"
+    TIME g "|               访问方式为 宿主机ip:8082                  |"
+    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
+    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
