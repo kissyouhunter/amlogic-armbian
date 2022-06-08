@@ -9,20 +9,40 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      set_branch:
+        description: "Branch: edge / current / legacy"
+        required: false
+        default: "edge"
       set_release:
-        description: "RELEASE: bullseye / jammy"
+        description: "Release: jammy / focal / bullseye"
         required: false
         default: "jammy"
       set_board:
-        description: "BOARD: lepotato / odroidn2"
+        description: "Board: odroidn2 / lepotato"
         required: false
         default: "odroidn2"
-      set_kernel:
-        description: "KERNEL: 5.4.y / 5.10.y / 5.15.y"
+      set_desktop:
+        description: "Build Desktop: no / gnome / xfce, etc."
         required: false
-        default: "none"        
-      set_opts:
-        description: "More build options: for compile.sh"
+        default: "no"
+      armbian_soc:
+        description: "Set Amlogic SoC."
+        required: false
+        default: "s905d"
+      armbian_kernel:
+        description: "Set kernel version."
+        required: false
+        default: "5.4.197"
+      armbian_size:
+        description: "Set armbian rootfs size(Unit: MiB)."
+        required: false
+        default: "2748"
+      armbian_fstype:
+        description: "Set armbian rootfs type: ext4 / btrfs"
+        required: false
+        default: "ext4"
+      armbian_sign:
+        description: "Set armbian custom name."
         required: false
         default: ""
   #schedule:
@@ -30,40 +50,71 @@ on:
 
 env:
   TZ: Asia/Shanghai
-  UPLOAD_FIRMWARE: true
-  SERVERCHAN_SCKEY: true
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: choose kernel
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          ARR_RELEASE=("jammy" "bullseye")
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+
+          ARR_BRANCH=("edge" "current" "legacy")
+          set_branch="${{ github.event.inputs.set_branch }}"
+          if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
+              set_branch="current"
+          fi
+          echo "ARMBIAN_BRANCH=${set_branch}" >> $GITHUB_ENV
+
+          ARR_RELEASE=("jammy" "focal" "bullseye")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="jammy"
+              set_release="focal"
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
-          
+
           ARR_BOARD=("lepotato" "odroidn2")
           set_board="${{ github.event.inputs.set_board }}"
           if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
               set_board="lepotato"
           fi
-          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV         
+          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
-          set_kernel="${{ github.event.inputs.set_kernel }}"
-          if [ "$set_kernel" = "none" ]; then
-            echo "no kernel was chosen"
+          # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
+          ARR_DESKTOP=("no" "budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
+          set_desktop="${{ github.event.inputs.set_desktop }}"
+          if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
+              # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
+              str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
+              edition_name="${set_desktop}_desktop"
           else
-            echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
+              str_desktop="BUILD_DESKTOP=no"
+              edition_name="server"
           fi
+          echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
+          echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
+
+          set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
+          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
+          echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
+
+          set_kernel="${{ github.event.inputs.armbian_kernel }}"
+          echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
 
       - name: telegrame_bot
         run: |
@@ -75,56 +126,34 @@ jobs:
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
             您正在使用kissyouhunter仓库的 {CPU型号为 [ ${CPUNAME} ] 核心数 为 [ ${CPUCORES} ] 线程数为 [ $(nproc) ]的机器} 编译 Armbian ${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_KERNEL }} for N1 编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
-          fi           
-
-      - name: Initialization environment
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
-          sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
-          echo "ARMBIAN_MORE_OPTS=${{ github.event.inputs.set_opts }}" >> $GITHUB_ENV
+          fi 
 
       - name: Download source code
         id: down
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
+      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         id: compile
         run: |
+          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current \
-                            BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
-                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha,img ${{ env.ARMBIAN_MORE_OPTS }}
+          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP_STR }} \
+                            HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
-      - name: Rebuild Armbian for amlogic s9xxx
-        id: rebuild
+      - name: Rebuild Armbian for Amlogic s9xxx
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
-        run: |
-          sudo chmod +x build-armbian/common-files/files/usr/sbin/*
-          sudo chmod +x rebuild
-          
-          set_kernel="${{ github.event.inputs.set_kernel }}"
-          if [ "$set_kernel" = "none" ]; then
-            echo "no kernel was chosen"
-          else
-            sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          fi
-          
-          cd build/output/images/ && sudo gzip *.img && sync
-          echo "FILEPATH=$PWD" >> $GITHUB_ENV
-          echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+        with:
+          build_target: armbian
+          armbian_path: build/output/images/*.img
+          armbian_soc: ${{ github.event.inputs.armbian_soc }}
+          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
+          armbian_size: ${{ github.event.inputs.armbian_size }}
+          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
+          armbian_sign: ${{ env.ARMBIAN_CUSTOM_NAME }}
 
       - name: Upload Armbian image to Actions
         uses: kittaakos/upload-artifact-as-is@master
