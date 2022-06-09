@@ -144,7 +144,7 @@ jobs:
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for Amlogic s9xxx
-        uses: ophub/amlogic-s9xxx-armbian@main
+        id: rebuild
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           sudo chmod +x build-armbian/common-files/files/usr/sbin/*
