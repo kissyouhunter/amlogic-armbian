@@ -14,9 +14,9 @@ on:
         required: false
         default: "bullseye"
       set_board:
-        description: "BOARD: lepotato / odroidn2"
+        description: "BOARD: lepotato / Odroidn2"
         required: false
-        default: "odroidn2"        
+        default: "Odroidn2"        
       set_kernel:
         description: "KERNEL: 5.4.y / 5.10.y / 5.15.y"
         required: false
