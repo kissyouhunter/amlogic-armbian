@@ -94,6 +94,7 @@ jobs:
         run: |
           armbian_buildpath="build/output/images"
           mkdir -p "${armbian_buildpath}"
+          ls -a
           #[ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
           #down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
           #down_path="Armbian_Aml_${{ github.event.inputs.sel_tags_keywords }}.*/Armbian_.*-trunk_.*.img.gz"
