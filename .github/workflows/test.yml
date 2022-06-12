@@ -1,0 +1,136 @@
+#==========================================================================
+# Description: Build Armbian For Amlogic s9xxx tv box
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#==========================================================================
+
+name: test
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_release:
+        description: "RELEASE: bullseye / focal"
+        required: false
+        default: "bullseye"
+      set_board:
+        description: "BOARD: lepotato / odroidn2"
+        required: false
+        default: "odroidn2"        
+      set_kernel:
+        description: "KERNEL: 5.4.y / 5.10.y / 5.15.y"
+        required: false
+        default: "none"
+env:
+  TZ: Asia/Shanghai
+  BASE_KERNEL: 5.10.111
+  UPLOAD_FIRMWARE: true
+  SERVERCHAN_SCKEY: true
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: choose kernel
+        run: |
+          ARR_RELEASE=("focal" "bullseye" "buster")
+          set_release="${{ github.event.inputs.set_release }}"
+          #if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
+              #set_release="focal"
+          #fi
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+          
+          ARR_BOARD=("lepotato" "odroidn2")
+          set_board="${{ github.event.inputs.set_board }}"
+          #if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
+              #set_board="lepotato"
+          #fi
+          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV         
+
+          set_kernel="${{ github.event.inputs.set_kernel }}"
+          if [ "$set_kernel" = "none" ]; then
+            echo "no kernel was chosen"
+          else
+            echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
+          fi
+
+      - name: telegrame_bot
+        run: |
+          if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+            curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
+            您正在使用kissyouhunter仓库的Armbian_22.05.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          fi 
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+      - name: Rebuild Armbian for amlogic s9xxx
+        id: rebuild
+        if: (!cancelled())
+        run: |
+          armbian_buildpath="build/output/images"
+          [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
+          down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+          down_path="Armbian_Aml_${{ github.event.inputs.sel_tags_keywords }}.*/Armbian_.*-trunk_.*.img.gz"
+          down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
+          down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
+          [ -z "${down_file}" ] && echo "Invalid download file." && exit 1
+          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz &&gzip -df *.img.gz && sync
+          set_release="_"
+          out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          i=1
+          for r in ${ARR_RELEASE[*]}; do
+              if [[ "${out_releasename}" == *${r}* ]]; then
+                  set_release="_${r}_"
+                  break
+              fi
+              let i++
+          done
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+
+          cd ${GITHUB_WORKSPACE}
+          sudo chmod +x build-armbian/common-files/files/usr/sbin/*
+          sudo chmod +x rebuild
+
+          set_kernel="${{ github.event.inputs.set_kernel }}"
+          if [ "$set_kernel" = "none" ]; then
+            echo "no kernel was chosen"
+          else
+            sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
+          fi
+          
+          cd ./build/output/images
+          ls
+          rm -f Armbian_22.05.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img
+          sudo gzip *.img && sync
+          echo "FILEPATH=$PWD" >> $GITHUB_ENV
+          echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
+
+      - name: Upload Armbian image to Actions
+        uses: kittaakos/upload-artifact-as-is@master
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        with:
+          path: ${{ env.FILEPATH }}/
+
+      - name: telegram_bot
+        run: |
+          if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+            curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的✨主人✨：
+            您使用kissyouhunter仓库的Armbian_22.05.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          fi          
