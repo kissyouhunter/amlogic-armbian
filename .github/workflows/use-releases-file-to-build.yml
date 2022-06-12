@@ -104,6 +104,7 @@ jobs:
           #down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           #[ -z "${down_file}" ] && echo "Invalid download file." && exit 1
           cd build/output/images && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz
+          find -name Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz
           cd build/output/images && gzip -df *.img.gz && sync
           #
           # down_tag: Armbian_Aml_bullseye_gnome_desktop
