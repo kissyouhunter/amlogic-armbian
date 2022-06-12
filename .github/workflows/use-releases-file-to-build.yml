@@ -90,7 +90,7 @@ jobs:
 
       - name: Download Armbian from Releases & Rebuild Armbian for Amlogic s9xxx
         id: rebuild
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: (!cancelled())
         run: |
           armbian_buildpath="build/output/images"
           [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
