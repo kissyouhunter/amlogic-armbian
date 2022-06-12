@@ -50,6 +50,7 @@ on:
 
 env:
   TZ: Asia/Shanghai
+  UPLOAD_FIRMWARE: true
 
 jobs:
   build:
@@ -161,24 +162,6 @@ jobs:
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         with:
           path: ${{ env.FILEPATH }}/
-
-      - name: Upload Armbian image to Release
-        id: release
-        uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && !cancelled()
-        with:
-          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
-          artifacts: ${{ env.FILEPATH }}/*
-          allowUpdates: true
-          token: ${{ secrets.GH_TOKEN }}
-          body: |
-            N1 专用 Armbian
-            * Firmware information
-            默认账户: root
-            默认密码: 1234
-            安装到emmc命令: armbian-install
-            更新内核命令: armbian-update
-            Edition: ${{ env.ARMBIAN_DESKTOP_OPT }}
 
       - name: telegram_bot
         run: |
