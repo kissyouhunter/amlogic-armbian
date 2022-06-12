@@ -100,7 +100,7 @@ jobs:
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          cd build/output/images/ && sudo gzip *.img && sync
+          cd build/output/images/ && rm -f Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           echo "FILE_DATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
