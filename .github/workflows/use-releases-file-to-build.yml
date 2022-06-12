@@ -93,8 +93,8 @@ jobs:
         if: (!cancelled())
         run: |
           armbian_buildpath="build/output/images"
-          mkdir -p "${armbian_buildpath}"
-          ls -a
+          mkdir -p build/output/images
+          ls -la
           #[ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
           #down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
           #down_path="Armbian_Aml_${{ github.event.inputs.sel_tags_keywords }}.*/Armbian_.*-trunk_.*.img.gz"
@@ -103,8 +103,8 @@ jobs:
           #down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           #down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           #[ -z "${down_file}" ] && echo "Invalid download file." && exit 1
-          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz
-          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
+          cd build/output/images && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz
+          cd build/output/images && gzip -df *.img.gz && sync
           #
           # down_tag: Armbian_Aml_bullseye_gnome_desktop
           #down_tag="${down_filename%%/*}" && down_tag="${down_tag%_*}"
