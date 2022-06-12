@@ -64,16 +64,16 @@ jobs:
         run: |
           ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.sel_tags_keywords }}"
-          if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="focal"
-          fi
+          #if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
+              #set_release="focal"
+          #fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
           ARR_BOARD=("lepotato" "odroidn2")
           set_board="${{ github.event.inputs.set_board }}"
-          if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
-              set_board="lepotato"
-          fi
+          #if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
+              #set_board="lepotato"
+          #fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV    
 
           set_kernel="${{ github.event.inputs.armbian_kernel }}"
