@@ -96,7 +96,7 @@ jobs:
           [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
           cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_22.08.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img.gz
           gzip -df *.img.gz && sync
-
+          cd ${GITHUB_WORKSPACE}
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
