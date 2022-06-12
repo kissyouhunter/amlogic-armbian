@@ -117,7 +117,7 @@ jobs:
           #down_edition="$(echo ${down_tag} | cut -d"_" -f4-)"
           #echo "ARMBIAN_DESKTOP_OPT=${down_edition}" >> $GITHUB_ENV
           #
-          #echo "::set-output name=status::success"
+          echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for Amlogic s9xxx
         id: rebuild
