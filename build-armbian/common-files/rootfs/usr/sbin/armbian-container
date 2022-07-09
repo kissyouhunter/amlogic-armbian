@@ -46,7 +46,7 @@ JELLYFIN_PORT="8096"
 JELLYFIN_PORT1="8920"
 # qbittorrent变量
 QB_DOCKER_IMG_NAME="johngong/qbittorrent"
-QB_TAG="qee-latest"
+QB_TAG="4.4.3.1-4.4.3.12"
 QB_PATH=""
 QB_CONFIG_FOLDER=$(pwd)/qbittorrent
 QB_DOWNLOADS_FOLDER=$(pwd)/downloads
@@ -96,8 +96,6 @@ N1_AAPANEL_FOLDER=/mnt/mmcblk2p4/aapanel
 AAPANEL_CONTAINER_NAME=""
 # MaiARK 变量
 MAIARK_DOCKER_IMG_NAME="kissyouhunter/maiark"
-MAIARK_TAG_AMD="amd64"
-MAIARK_TAG_ARM="arm64"
 MAIARK_PATH=""
 MAIARK_CONFIG_FOLDER=$(pwd)/MaiARK
 N1_MAIARK_FOLDER=/mnt/mmcblk2p4/MarARK
@@ -143,22 +141,23 @@ TIME() {
 
 TIME w "============================================"
 TIME w "              欢迎使用一键脚本"
-TIME w "             请按照命令提示操作"
-TIME r "           请保证科学上网已经开启"
-TIME w "        安装过程中可以按ctrl+c强制退出"
+TIME w "            作者：kissyouhunter"
+TIME r "          请保证科学上网已经开启"
+TIME w "      安装过程中可以按ctrl+c强制退出"
+TIME w "     https://github.com/kissyouhunter"
 TIME w "============================================"
 #cat << EOF
-TIME w "(1) 安装docker和docker-compose"
-TIME w "(2) 安装<青龙>到宿主机"
-TIME w "(3) 安装<elecv2p>到宿主机"
-TIME w "(4) 安装docker图形管理工具"
-TIME w "(5) 安装emby或jellyfin(打造自己的爱奇艺)"
+TIME w "(1) 安装 docker和 docker-compose"
+TIME w "(2) 安装 青龙 到宿主机"
+TIME w "(3) 安装 elecv2p 到宿主机"
+TIME w "(4) 安装 docker 图形管理工具"
+TIME w "(5) 安装 emby 或 jellyfin (打造自己的爱奇艺)"
 TIME w "(6) 安装下载工具"
-TIME w "(7) TG定时发送信息工具"
+TIME w "(7) Telegram 定时发送信息工具"
 TIME w "(8) AdGuardHome DNS解析+去广告"
 TIME w "(9) x-ui"
-TIME w "(10) aaPanel(宝塔国际版)"
-TIME w "(11) MaiARK(对接青龙提交京东CK)"
+TIME w "(10) aaPanel (宝塔国际版)"
+TIME w "(11) MaiARK (对接青龙提交京东CK)"
 TIME r "(0) 不想安装了，给老子退出！！！"
 #EOF
 read -p "Please enter your choice[0-11]: " input
@@ -173,18 +172,18 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-3]****|"
 TIME w "|******* DOCKER & DOCKER-COMPOSE ******|"
 TIME w "----------------------------------------"
-TIME w "(1) 安装docker和docker-comopse"
-TIME w "(2) X86 openwrt安装docker和装docker-comopse"
-TIME w "(3) Arm64 openwrt安装docker和装docker-comopse(例 N1 等)"
+TIME w "(1) 安装 docker 和 docker-compose "
+TIME w "(2) X86 openwrt 安装 docker 和 docker-comopse"
+TIME w "(3) Arm64 openwrt 安装 docker和 docker-comopse(例 N1 等)"
 TIME b "(0) 返回上级菜单"
 #EOF
-TIME l "<注>openwrt宿主机默认安装dockerman图形docker管理工具！"
+TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具！"
  read -p "Please enter your Choice[0-3]: " input1
- case $input1 in 
+ case $input1 in
  1)
-    TIME y " >>>>>>>>>>>开始安装docker和docker-compose"
+    TIME y " >>>>>>>>>>>开始安装 docker 和 docker-compose"
     if [ "$lsb_dist" == "openwrt" ]; then
-        TIME r "****openwrt宿主机请选择2或者3安装docker****"
+        TIME r "****openwrt 宿主机请选择 2 或者 3 安装 docker****"
     else
 		sleep 1
         bash <(curl -s -S -L https://raw.githubusercontent.com/kissyouhunter/Tools/main/docker-and-docker_compose.sh)
@@ -193,9 +192,9 @@ TIME l "<注>openwrt宿主机默认安装dockerman图形docker管理工具！"
     fi
   ;;
  2)
-    TIME y " >>>>>>>>>>>开始为X86 openwrt安装docker和docker-compose"
+    TIME y " >>>>>>>>>>>开始为 X86 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://tt.kisssik.ga/d/aliyun/files/docker-2010.12-1_x86_64.zip
+    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-2010.12-1_x86_64.zip
     unzip docker-2010.12-1_x86_64.zip && rm -f docker-2010.12-1_x86_64.zip
     cd /tmp/upload/docker-2010.12-1_x86_64 && opkg install *.ipk && cd .. && rm -rf docker-2010.12-1_x86_64/
     docker -v && docker-compose -v
@@ -203,20 +202,20 @@ TIME l "<注>openwrt宿主机默认安装dockerman图形docker管理工具！"
     sleep 5
   ;;
  3)
-    TIME y " >>>>>>>>>>>开始为Arm64 openwrt安装docker和docker-compose"
+    TIME y " >>>>>>>>>>>开始为 Arm64 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://tt.kisssik.ga/d/aliyun/files/docker-20.10.15-1_aarch64.zip
+    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.15-1_aarch64.zip
     unzip docker-20.10.15-1_aarch64.zip && rm -f docker-20.10.15-1_aarch64.zip
     cd /tmp/upload/docker-20.10.15-1_aarch64 && opkg install *.ipk
     cd /tmp/upload && rm -rf docker-20.10.15-1_aarch64/
     docker -v && docker-compose -v
-    TIME g "****docker安装完成，请返回上级菜单!****"
-    TIME g "****U盘上运行的OP，如果docker空间没有指定到 /mnt/sda4/docker ，请修改****"
+    TIME g "****docker 安装完成，请返回上级菜单!****"
+    TIME g "****U盘上运行的 OP ，如果 docker 空间没有指定到 /mnt/sda4/docker ，请修改****"
     TIME g "****dockerman > 设置 > Docker 根目录 修改为 /mnt/sda4/docker ****"
     sleep 5
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -243,13 +242,13 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|**************** 青龙 ****************|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
-TIME w "(2) N1的EMMC上运行的openwrt请选择 2"
+TIME w "(1) linxu系统、X86 的 openwrt、群辉等请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt 请选择 2"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按回车！"
  read -p "Please enter your choice[0-3]: " input2
- case $input2 in 
+ case $input2 in
  1)
   TIME y " >>>>>>>>>>>开始安装青龙"
 
@@ -280,7 +279,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	if [ "$NETWORK" = "host" ]; then
   		TIME y "青龙面板端口：5700"
   	elif [ "$NETWORK" = "bridge" ]; then
-  		TIME y "青龙网络请求查看端口：$QL_PORT"
+  		TIME y "青龙面板端口：$QL_PORT"
   	fi
   	read -r -p "以上信息是否正确？[Y/n] " input21
   	case $input21 in
@@ -378,7 +377,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       NETWORK="host"
       MAPPING_QL_PORT=""
   fi
-  
+
   if [ "$NETWORK" = "bridge" ]; then
       inp "是否修改青龙端口[默认 5700]：\n1) 修改\n2) 不修改[默认]"
       opt
@@ -411,6 +410,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       --hostname $QL_CONTAINER_NAME \
       --restart always \
       --network $NETWORK \
+      --log-opt max-size=10m \
+      --log-opt max-file=5 \
       $QL_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
@@ -442,6 +443,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       --hostname $QL_CONTAINER_NAME \
       --restart always \
       --network $NETWORK \
+      --log-opt max-size=10m \
+      --log-opt max-file=5 \
       $QL_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
@@ -450,18 +453,18 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   }
 
   input_container_ql1_judge() {
-  if [ $TAG == latest ] || [ $TAG == "2.12" ] || [ $TAG == "2.12.0" ] || [ $TAG == "2.12.1" ] || [ $TAG == "2.12.2" ] || [ $TAG == "2.13" ] || [ $TAG == "2.13.0" ] || [ $TAG == "2.13.1" ]; then
-      input_container_ql1_config1
-      input_container_ql1_name
-      input_container_ql1_network_config
-      input_container_ql1_check
-      input_container_ql1_build1
-  else 
+  if [ $TAG == "2.10" ] || [ $TAG == "2.10.6" ] || [ $TAG == "2.10.7" ] || [ $TAG == "2.10.8" ] || [ $TAG == "2.10.9" ] || [ $TAG == "2.10.10" ] || [ $TAG == "2.10.11" ] || [ $TAG == "2.10.12" ] || [ $TAG == "2.10.13" ] || [ $TAG == "2.11" ] || [ $TAG == "2.11.0" ] || [ $TAG == "2.11.1" ] || [ $TAG == "2.11.2" ] || [ $TAG == "2.11.3" ]; then
       input_container_ql1_config2
       input_container_ql1_name
       input_container_ql1_network_config
       input_container_ql1_check
       input_container_ql1_build2
+  else
+      input_container_ql1_config1
+      input_container_ql1_name
+      input_container_ql1_network_config
+      input_container_ql1_check
+      input_container_ql1_build1
   fi
   }
   input_container_ql1_judge
@@ -480,8 +483,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "-----------------------------------------------------"
   exit 0
   ;;
- 2)  
-  TIME y " >>>>>>>>>>>开始安装青龙到N1的/mnt/mmcblk2p4/"
+ 2)
+  TIME y " >>>>>>>>>>>开始安装青龙到 N1 的 /mnt/mmcblk2p4/"
 
     input_container_ql2_info() {
     log "列出所有宿主机上的容器"
@@ -510,7 +513,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	if [ "$NETWORK" = "host" ]; then
   		TIME y "青龙面板端口：5700"
   	elif [ "$NETWORK" = "bridge" ]; then
-  		TIME y "青龙网络请求查看端口：$QL_PORT"
+  		TIME y "青龙面板端口：$QL_PORT"
   	fi
   	read -r -p "以上信息是否正确？[Y/n] " input21
   	case $input21 in
@@ -588,7 +591,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   LOG_PATH=$QL_PATH/log
   DEPS_PATH=$QL_PATH/deps
   }
-  
+
   # 输入容器名
   input_container_ql2_name() {
     echo -n -e "请输入将要创建的容器名[默认为：ql]-> "
@@ -609,7 +612,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       NETWORK="host"
       MAPPING_QL_PORT=""
   fi
-  
+
   if [ "$NETWORK" = "bridge" ]; then
       inp "是否修改青龙端口[默认 5700]：\n1) 修改\n2) 不修改[默认]"
       opt
@@ -626,7 +629,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   input_container_ql2_build1() {
   TIME y " >>>>>>>>>>>配置完成，开始安装青龙"
   log "1.开始创建配置文件目录"
-  PATH_LIST=($CONFIG_PATH $DB_PATH $REPO_PATH $SCRIPT_PATH $LOG_PATH $DEPS_PATH)
+  PATH_LIST=($CONFIG_PATH)
   for i in ${PATH_LIST[@]}; do
       mkdir -p $i
   done
@@ -642,6 +645,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       --hostname $QL_CONTAINER_NAME \
       --restart always \
       --network $NETWORK \
+      --log-opt max-size=10m \
+      --log-opt max-file=5 \
       $QL_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
@@ -657,7 +662,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       mkdir -p $i
   done
 
-  log "3.开始创建容器并执行"
+  log "2.开始创建容器并执行"
   docker run -dit \
       -t \
       -v $CONFIG_PATH:/ql/config \
@@ -673,6 +678,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       --hostname $QL_CONTAINER_NAME \
       --restart always \
       --network $NETWORK \
+      --log-opt max-size=10m \
+      --log-opt max-file=5 \
       $QL_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
@@ -681,18 +688,18 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   }
 
   input_container_ql2_judge() {
-  if [ $TAG == latest ]; then
-      input_container_ql2_config1
-      input_container_ql2_name
-      input_container_ql2_network_config
-      input_container_ql2_check
-      input_container_ql2_build1
-  else 
+  if [ $TAG == "2.10" ] || [ $TAG == "2.10.6" ] || [ $TAG == "2.10.7" ] || [ $TAG == "2.10.8" ] || [ $TAG == "2.10.9" ] || [ $TAG == "2.10.10" ] || [ $TAG == "2.10.11" ] || [ $TAG == "2.10.12" ] || [ $TAG == "2.10.13" ] || [ $TAG == "2.11" ] || [ $TAG == "2.11.0" ] || [ $TAG == "2.11.1" ] || [ $TAG == "2.11.2" ] || [ $TAG == "2.11.3" ]; then
       input_container_ql2_config2
       input_container_ql2_name
       input_container_ql2_network_config
       input_container_ql2_check
       input_container_ql2_build2
+  else
+      input_container_ql2_config1
+      input_container_ql2_name
+      input_container_ql2_network_config
+      input_container_ql2_check
+      input_container_ql2_build1
   fi
   }
   input_container_ql2_judge
@@ -711,8 +718,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "-----------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -739,18 +746,18 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|*************** ELECV2P **************|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
-TIME w "(2) N1的EMMC上运行的openwrt请选择 2"
+TIME w "(1) linxu系统、X86 的 openwrt、群辉等请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt 请选择 2"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按回车！"
  read -p "Please enter your Choice[0-2]: " input3
- case $input3 in 
+ case $input3 in
  1)
-  TIME y " >>>>>>>>>>>开始安装elecv2p"
+  TIME y " >>>>>>>>>>>开始安装 elecv2p"
   # 创建映射文件夹
   input_container_v2p1_config() {
-  echo -n -e "请输入elecv2p配置文件保存的绝对路径（示例：/home/elecv2p)，回车默认为当前目录: "
+  echo -n -e "请输入 elecv2p 配置文件保存的绝对路径（示例：/home/elecv2p)，回车默认为当前目录: "
   read v2p_path
   if [ -z "$v2p_path" ]; then
       V2P_PATH=$V2P_SHELL_FOLDER
@@ -769,7 +776,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   LOG_PATH=$V2P_PATH/logs
   }
   input_container_v2p1_config
-  
+
   # 输入容器名
   input_container_v2p1_name() {
     echo -n -e "请输入将要创建的容器名[默认为：elecv2p]-> "
@@ -784,7 +791,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
 
   # 面板端口
   input_container_v2p1_webui_config() {
-  inp "是否修改elecv2p面板端口[默认 8100]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 面板端口[默认 8100]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port
   if [ "$change_v2p_port" = "1" ]; then
@@ -793,10 +800,10 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   fi
   }
   input_container_v2p1_webui_config
-  
+
   # ANYPROXY端口
   input_container_v2p1_anyproxy_config() {
-  inp "是否修改elecv2p的anyproxy端口[默认 8101]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 的 anyproxy 端口[默认 8101]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port1
   if [ "$change_v2p_port1" = "1" ]; then
@@ -805,10 +812,10 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   fi
   }
   input_container_v2p1_anyproxy_config
-  
+
   # 网络请求查看端口
   input_container_v2p1_http_config() {
-  inp "是否修改elecv2p网络请求查看端口[默认 8102]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 网络请求查看端口[默认 8102]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port2
   if [ "$change_v2p_port2" = "1" ]; then
@@ -849,7 +856,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装elecv2p"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 elecv2p"
   log "1.开始创建配置文件目录"
   PATH_LIST=($JSFILE_PATH $LISTS_PATH $STORE_PATH $SHELL_PATH $ROOTCA_PATH $EFSS_PATH $LOG_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -879,7 +886,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------"
-    TIME g "|      elev2p启动需要一点点时间，请耐心等待！       |"
+    TIME g "|      elev2p 启动需要一点点时间，请耐心等待！      |"
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     TIME g "|            访问方式为 宿主机ip:$V2P_PORT               |"
@@ -887,10 +894,10 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   exit 0
   ;;
  2)
-  TIME y " >>>>>>>>>>>开始安装elecv2p到N1的/mnt/mmcblk2p4/"
+  TIME y " >>>>>>>>>>>开始安装 elecv2p 到 N1 的 /mnt/mmcblk2p4/"
   # 创建映射文件夹
   input_container_v2p2_config() {
-  echo -n -e "请输入elecv2p存储的文件夹名称（如：elecv2p)，回车默认为 elecv2p: "
+  echo -n -e "请输入 elecv2p 存储的文件夹名称（如：elecv2p)，回车默认为 elecv2p: "
   read v2p_path
   if [ -z "$v2p_path" ]; then
       V2P_PATH=$N1_V2P_FOLDER
@@ -909,7 +916,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   LOG_PATH=$V2P_PATH/logs
   }
   input_container_v2p2_config
-  
+
   # 输入容器名
   input_container_v2p2_name() {
     echo -n -e "请输入将要创建的容器名[默认为：elecv2p]-> "
@@ -924,7 +931,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
 
   # 面板端口
   input_container_v2p2_webui_config() {
-  inp "是否修改elecv2p面板端口[默认 8100]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 面板端口[默认 8100]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port
   if [ "$change_v2p_port" = "1" ]; then
@@ -933,10 +940,10 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   fi
   }
   input_container_v2p2_webui_config
-  
+
   # ANYPROXY端口
   input_container_v2p2_anyproxy_config() {
-  inp "是否修改elecv2p的anyproxy端口[默认 8101]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 的 anyproxy 端口[默认 8101]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port1
   if [ "$change_v2p_port1" = "1" ]; then
@@ -945,10 +952,10 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   fi
   }
   input_container_v2p2_anyproxy_config
-  
+
   # 网络请求查看端口
   input_container_v2p2_http_config() {
-  inp "是否修改elecv2p网络请求查看端口[默认 8102]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 elecv2p 网络请求查看端口[默认 8102]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_v2p_port2
   if [ "$change_v2p_port2" = "1" ]; then
@@ -989,7 +996,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装elecv2p"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 elecv2p"
   log "1.开始创建配置文件目录"
   PATH_LIST=($JSFILE_PATH $LISTS_PATH $STORE_PATH $SHELL_PATH $ROOTCA_PATH $EFSS_PATH $LOG_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1019,15 +1026,15 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------"
-    TIME g "|      elev2p启动需要一点点时间，请耐心等待！       |"
+    TIME g "|      elev2p 启动需要一点点时间，请耐心等待！      |"
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     TIME g "|            访问方式为 宿主机ip:$V2P_PORT               |"
     TIME g "-----------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -1051,69 +1058,71 @@ while [ "$flag" -eq 0 ]
 do
 #cat << EOF
 TIME w "----------------------------------------"
-TIME w "|****Please Enter Your Choice:[0-2]****|"
-TIME w "|********** PORTAINER & YACHT *********|"
+TIME w "|****Please Enter Your Choice:[0-3]****|"
+TIME w "|********* DOCKER 图形管理工具 ********|"
 TIME w "----------------------------------------"
-TIME w "(1) 安装portianer"
-TIME w "(2) 安装yacht"
-TIME w "(3) 安装simpledocker 中文"
+TIME w "(1) 安装 portianer"
+TIME w "(2) 安装 Fast Os Docker 中文"
+TIME w "(3) 安装 simpledocker 中文"
 TIME b "(0) 返回上级菜单"
 #EOF
- read -p "Please enter your Choice[0-2]: " input4
- case $input4 in 
+ read -p "Please enter your Choice[0-3]: " input4
+ case $input4 in
  1)
-    TIME y " >>>>>>>>>>>开始安装portainer"
+    TIME y " >>>>>>>>>>>开始安装 portainer"
     docker volume create portainer_data
     docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    
+
     if [ $? -ne 0 ] ; then
         cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
     fi
-
+      log "列出所有宿主机上的容器"
+      docker ps -a
     TIME g "------------------------------------------------------"
-    TIME g "|      portainer启动需要一点点时间，请耐心等待！     |"
+    TIME g "|      portainer 启动需要一点点时间，请耐心等待！    |"
     sleep 10
     TIME g "|              安装完成，自动退出脚本                |"
     TIME g "|   访问方式为宿主机ip:端口(例192.168.2.1:9000)      |"
     TIME g "------------------------------------------------------"
-  exit 0  
+  exit 0
   ;;
  2)
-    TIME y " >>>>>>>>>>>开始安装yacht"
-    docker volume create yacht
-    docker run -d -p 8008:8000 --name=yacht --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v yacht:/config selfhostedpro/yacht    
+    TIME y " >>>>>>>>>>>开始安装 Fast Os Docker"
+    docker run --restart always --name fast -p 18081:8081 -d -v /var/run/docker.sock:/var/run/docker.sock wangbinxingkong/fast
     if [ $? -ne 0 ] ; then
         cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
     fi
-
+      log "列出所有宿主机上的容器"
+      docker ps -a
     TIME g "------------------------------------------------------"
-    TIME g "|         yacht启动需要一点点时间，请耐心等待！      |"
+    TIME g "|          fast 启动需要一点点时间，请耐心等待！     |"
     sleep 10
     TIME g "|              安装完成，自动退出脚本                |"
-    TIME g "|       默认账号：admin@yacht.local 密码：pass       |"
-    TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:8008)    |"
+    TIME g "|            首次登陆注册账号和密码即可              |"
+    TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:18081)   |"
     TIME g "------------------------------------------------------"
-  exit 0  
+  exit 0
   ;;
  3)
-    TIME y " >>>>>>>>>>>开始安装simpledocker"
-    cd /tmp && curl -Lo docker-compose.yml https://raw.githubusercontent.com/kissyouhunter/Tools/main/simpledocker-docker-compose.yml
-    docker-compose up -d    
+    TIME y " >>>>>>>>>>>开始安装 simpledocker"
+    mkdir -p simpledocker && cd simpledocker && curl -Lo docker-compose.yml https://raw.githubusercontent.com/kissyouhunter/Tools/main/simpledocker-docker-compose.yml
+    docker-compose up -d
     if [ $? -ne 0 ] ; then
         cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
     fi
-
+      log "列出所有宿主机上的容器"
+      docker ps -a
     TIME g "------------------------------------------------------"
-    TIME g "|     simpledocker启动需要一点点时间，请耐心等待！   |"
+    TIME g "|    simpledocker 启动需要一点点时间，请耐心等待！   |"
     sleep 10
     TIME g "|              安装完成，自动退出脚本                |"
     TIME g "|           默认账号：admin 密码：123456             |"
     TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:9009)    |"
     TIME g "------------------------------------------------------"
-  exit 0  
+  exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -1127,8 +1136,8 @@ TIME b "(0) 返回上级菜单"
    done
  clear
  ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -1155,18 +1164,18 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|*********** EMBY & JELLYFIN **********|"
 TIME w "----------------------------------------"
-TIME w "(1) 安装emby (开心版暂无arm64)"
-TIME w "(2) 安装jellyfin"
+TIME w "(1) 安装 emby (开心版暂无 arm64)"
+TIME w "(2) 安装 jellyfin"
 TIME b "(0) 返回上级菜单"
 #EOF
-TIME r "<注>请使用root账户部署容器"
+TIME r "<注>请使用 root 账户部署容器"
  read -p "Please enter your Choice[0-2]: " input5
- case $input5 in 
+ case $input5 in
  1)
-    TIME y " >>>>>>>>>>>开始安装emby"
+    TIME y " >>>>>>>>>>>开始安装 emby"
   # 创建映射文件夹
   input_container_emby_config() {
-  echo -n -e "请输入emby配置文件保存的绝对路径（示例：/home/emby)，回车默认为当前目录: "
+  echo -n -e "请输入 emby 配置文件保存的绝对路径（示例：/home/emby)，回车默认为当前目录: "
   read emby_path
   if [ -z "$emby_path" ]; then
       EMBY_PATH=$EMBY_CONFIG_FOLDER
@@ -1199,7 +1208,7 @@ TIME r "<注>请使用root账户部署容器"
   fi
   }
   input_container_emby_config
-  
+
   # 输入容器名
   input_container_emby_name() {
     echo -n -e "请输入将要创建的容器名[默认为：emby]-> "
@@ -1214,7 +1223,7 @@ TIME r "<注>请使用root账户部署容器"
 
   # 面板端口
   input_container_emby_webui_config() {
-  inp "是否修改emby面板端口[默认 8096]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 emby 面板端口[默认 8096]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_emby_port
   if [ "$change_emby_port" = "1" ]; then
@@ -1223,10 +1232,10 @@ TIME r "<注>请使用root账户部署容器"
   fi
   }
   input_container_emby_webui_config
-  
+
   # https端口
   input_container_emby_https_config() {
-  inp "是否修改emby的https端口[默认 8920]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 emby 的 https 端口[默认 8920]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_emby_port1
   if [ "$change_emby_port1" = "1" ]; then
@@ -1244,7 +1253,7 @@ TIME r "<注>请使用root账户部署容器"
   	TIME y "emby 电视剧文件路径：$TVSHOWS_PATH"
   	TIME y "emby 容器名：$EMBY_CONTAINER_NAME"
   	TIME y "emby 面板端口：$EMBY_PORT"
-  	TIME y "emby https端口：$EMBY_PORT1"
+  	TIME y "emby https 端口：$EMBY_PORT1"
   	read -r -p "以上信息是否正确？[Y/n] " input51
   	case $input51 in
   		[yY][eE][sS]|[yY])
@@ -1266,7 +1275,7 @@ TIME r "<注>请使用root账户部署容器"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装emby"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 emby"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $MOVIES_PATH $TVSHOWS_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1313,20 +1322,20 @@ TIME r "<注>请使用root账户部署容器"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------------"
-    TIME g "|              emby启动需要一点点时间，请耐心等待！             |"
+    TIME g "|              emby 启动需要一点点时间，请耐心等待！            |"
     sleep 10
     TIME g "|                    安装完成，自动退出脚本                     |"
-    TIME g "|         emby默认端口为8096，如有修改请访问修改的端口          |"
+    TIME g "|         emby 默认端口为8096，如有修改请访问修改的端口         |"
     TIME g "|         访问方式为宿主机ip:端口(例192.168.2.1:8096)           |"
-    TIME g "|   openwrt需要先执行命令 chmod 777 /dev/dri/* 才能读取到显卡   |"
+    TIME g "|   openwrt 需要先执行命令 chmod 777 /dev/dri/* 才能读取到显卡  |"
     TIME g "-----------------------------------------------------------------"
   exit 0
   ;;
  2)
-    TIME y " >>>>>>>>>>>开始安装jellyfin"
+    TIME y " >>>>>>>>>>>开始安装 jellyfin"
   # 创建映射文件夹
   input_container_jellyfin_config() {
-  echo -n -e "请输入jellyfin配置文件保存的绝对路径（示例：/home/jellyfin)，回车默认为当前目录: "
+  echo -n -e "请输入 jellyfin 配置文件保存的绝对路径（示例：/home/jellyfin)，回车默认为当前目录: "
   read jellyfin_path
   if [ -z "$jellyfin_path" ]; then
       JELLYFIN_PATH=$JELLYFIN_CONFIG_FOLDER
@@ -1359,7 +1368,7 @@ TIME r "<注>请使用root账户部署容器"
   fi
   }
   input_container_jellyfin_config
-  
+
   # 输入容器名
   input_container_jellyfin_name() {
     echo -n -e "请输入将要创建的容器名[默认为：jellyfin]-> "
@@ -1374,7 +1383,7 @@ TIME r "<注>请使用root账户部署容器"
 
   # 面板端口
   input_container_jellyfin_webui_config() {
-  inp "是否修改jellyfin面板端口[默认 8096]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 jellyfin 面板端口[默认 8096]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_jellyfin_port
   if [ "$change_jellyfin_port" = "1" ]; then
@@ -1383,10 +1392,10 @@ TIME r "<注>请使用root账户部署容器"
   fi
   }
   input_container_jellyfin_webui_config
-  
+
   # https端口
   input_container_jellyfin_https_config() {
-  inp "是否修改jellyfin的https端口[默认 8920]：\n1) 修改\n2) 不修改[默认]"
+  inp "是否修改 jellyfin 的 https 端口[默认 8920]：\n1) 修改\n2) 不修改[默认]"
   opt
   read change_jellyfin_port1
   if [ "$change_jellyfin_port1" = "1" ]; then
@@ -1426,7 +1435,7 @@ TIME r "<注>请使用root账户部署容器"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装jellyfin"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 jellyfin"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $MOVIES_PATH $TVSHOWS_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1473,17 +1482,17 @@ TIME r "<注>请使用root账户部署容器"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------------"
-    TIME g "|              emby启动需要一点点时间，请耐心等待！             |"
+    TIME g "|            jellyfin 启动需要一点点时间，请耐心等待！         |"
     sleep 10
     TIME g "|                    安装完成，自动退出脚本                     |"
-    TIME g "|       jellyfin默认端口为8096，如有修改请访问修改的端口        |"
+    TIME g "|       jellyfin 默认端口为8096，如有修改请访问修改的端口       |"
     TIME g "|         访问方式为宿主机ip:端口(例192.168.2.1:8096)           |"
-    TIME g "|   openwrt需要先执行命令 chmod 777 /dev/dri/* 才能读取到显卡   |"
+    TIME g "|   openwrt 需要先执行命令 chmod 777 /dev/dri/* 才能读取到显卡  |"
     TIME g "-----------------------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -1510,20 +1519,20 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-3]****|"
 TIME w "|******** QBITTORRENT & ARIA2 *********|"
 TIME w "----------------------------------------"
-TIME w "(1) 安装qbittorrent增强版"
-TIME w "(2) 安装aria2"
-TIME w "(3) 安装aria2-pro"
+TIME w "(1) 安装 qbittorrent 增强版"
+TIME w "(2) 安装 aria2"
+TIME w "(3) 安装 aria2-pro"
 TIME b "(0) 返回上级菜单"
 #EOF
-TIME r "<注>请使用root账户部署容器"
-TIME r "<注>aria2和aria2-pro 二选一"
+TIME r "<注>请使用 root 账户部署容器"
+TIME r "<注> aria2 和 aria2-pro 二选一"
  read -p "Please enter your Choice[0-3]: " input6
- case $input6 in 
+ case $input6 in
  1)
-    TIME y " >>>>>>>>>>>开始安装qbittorrent增强版"
+    TIME y " >>>>>>>>>>>开始安装 qbittorrent 增强版"
   # 创建映射文件夹
   input_container_qb_config() {
-  echo -n -e "请输入qbittorrent增强版配置文件保存的绝对路径（示例：/home/qbittorrent)，回车默认为当前目录: "
+  echo -n -e "请输入 qbittorrent 增强版配置文件保存的绝对路径（示例：/home/qbittorrent)，回车默认为当前目录: "
   read qb_path
   if [ -z "$qb_path" ]; then
       QB_PATH=$QB_CONFIG_FOLDER
@@ -1582,7 +1591,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装qbittorrent"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 qbittorrent 增强版"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $MOVIES_PATH $TVSHOWS_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1593,9 +1602,9 @@ TIME r "<注>aria2和aria2-pro 二选一"
   docker run -dit \
       -v $QB_PATH:/config \
       -v $DOWNLOADS_PATH:/Downloads \
-      -e WEBUIPORT=8989 \
+      -e QB_WEBUI_PORT=8989 \
       -p 6881:6881 -p 6881:6881/udp -p 8989:8989 \
-      -e TZ=Asia/Shanghai \
+      -e QB_EE_BIN=true \
       -e UID=0  \
       -e GID=0  \
       -e UMASK=022  \
@@ -1611,20 +1620,20 @@ TIME r "<注>aria2和aria2-pro 二选一"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "---------------------------------------------------------"
-    TIME g "|      qbittorrent启动需要一点点时间，请耐心等待！      |"
+    TIME g "|      qbittorrent 启动需要一点点时间，请耐心等待！     |"
     sleep 10
     TIME g "|               安装完成，自动退出脚本                  |"
-    TIME g "|  qbittorrent默认端口为8989，如有修改请访问修改的端口  |"
+    TIME g "|  qbittorrent 默认端口为8989，如有修改请访问修改的端口 |"
     TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:8989)       |"
-    TIME g "|         默认用户名admin，默认密码adminadmin           |"
+    TIME g "|         默认用户名admin，默认密码 adminadmin          |"
     TIME g "---------------------------------------------------------"
   exit 0
   ;;
  2)
-    TIME y " >>>>>>>>>>>开始安装aria2"
+    TIME y " >>>>>>>>>>>开始安装 aria2"
   # 创建映射文件夹
   input_container_aria2_config() {
-  echo -n -e "请输入aria2配置文件保存的绝对路径（示例：/home/aria2)，回车默认为当前目录: "
+  echo -n -e "请输入 aria2 配置文件保存的绝对路径（示例：/home/aria2)，回车默认为当前目录: "
   read aria2_path
   if [ -z "$aria2_path" ]; then
       ARIA2_PATH=$ARIA2_CONFIG_FOLDER
@@ -1646,7 +1655,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   fi
   }
   input_container_aria2_config
-  
+
   # 输入容器名
   input_container_aria2_name() {
     echo -n -e "请输入将要创建的容器名[默认为：aria2]-> "
@@ -1658,7 +1667,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
     fi
   }
   input_container_aria2_name
-  
+
   # TOKEN
   input_container_aria2_token() {
   inp "是否修改密钥[默认 aria2]：\n1) 修改\n2) 不修改[默认]"
@@ -1696,7 +1705,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装aria2"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 aria2"
   log "1.开始创建配置文件目录"
   PATH_LIST=($ARIA2_PATH $DOWNLOADS_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1733,22 +1742,22 @@ TIME r "<注>aria2和aria2-pro 二选一"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "---------------------------------------------------------"
-    TIME g "|          aria2启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         aria2 启动需要一点点时间，请耐心等待！        |"
     sleep 10
     TIME g "|                 安装完成，自动退出脚本                |"
-    TIME g "|     aria2默认端口为8080，如有修改请访问修改的端口     |"
+    TIME g "|     aria2 默认端口为8080，如有修改请访问修改的端口    |"
     TIME g "|     访问方式为宿主机ip:端口(例192.168.2.1:8080)       |"
     TIME g "|              Aria密钥设置在面板如下位置               |"
-    TIME g "|      AriaNg设置 > RPC(IP:6800) > Aria2 RPC 密钥       |"
+    TIME g "|      AriaNg 设置 > RPC(IP:6800) > Aria2 RPC 密钥      |"
     TIME g "---------------------------------------------------------"
     TIME z "                  设置的密钥为 $TOKEN"
   exit 0
   ;;
  3)
-    TIME y " >>>>>>>>>>>开始安装aria2-pro"
+    TIME y " >>>>>>>>>>>开始安装 aria2-pro"
   # 创建映射文件夹
   input_container_aria2_pro_config() {
-  echo -n -e "请输入aria2-pro配置文件保存的绝对路径（示例：/home/aria2-pro)，回车默认为当前目录: "
+  echo -n -e "请输入 aria2-pro 配置文件保存的绝对路径（示例：/home/aria2-pro)，回车默认为当前目录: "
   read aria2_pro_path
   if [ -z "$aria2_pro_path" ]; then
       ARIA2_PRO_PATH=$ARIA2_PRO_CONFIG_FOLDER
@@ -1770,7 +1779,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   fi
   }
   input_container_aria2_pro_config
-  
+
   # 输入容器名
   input_container_aria2_pro_name() {
     echo -n -e "请输入将要创建的容器名[默认为：aria2-pro]-> "
@@ -1832,7 +1841,7 @@ TIME r "<注>aria2和aria2-pro 二选一"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装aria2-pro"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 aria2-pro"
   log "1.开始创建配置文件目录"
   PATH_LIST=($ARIA2_PRO_PATH $DOWNLOADS_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1871,19 +1880,19 @@ TIME r "<注>aria2和aria2-pro 二选一"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "------------------------------------------------------------"
-    TIME g "|         aria2-pro启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         aria2-pro 启动需要一点点时间，请耐心等待！       |"
     sleep 10
     TIME g "|                    安装完成，自动退出脚本                |"
-    TIME g "|     aria2-pro默认端口为8080，如有修改请访问修改的端口    |"
+    TIME g "|    aria2-pro 默认端口为8080，如有修改请访问修改的端口    |"
     TIME g "|        访问方式为宿主机ip:端口(例192.168.2.1:6880)       |"
     TIME g "|                 Aria密钥设置在面板如下位置               |"
-    TIME g "|        AriaNg设置 > RPC(IP:6800) > Aria2 RPC 密钥        |"
+    TIME g "|        AriaNg 设置 > RPC(IP:6800) > Aria2 RPC 密钥       |"
     TIME g "------------------------------------------------------------"
     TIME z "                  设置的密钥为 $TOKEN"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -1910,18 +1919,18 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|************** TELETHON **************|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
-TIME w "(2) N1的EMMC上运行的openwrt请选择 2"
+TIME w "(1) linxu系统、X86 的 openwrt、群辉等请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt 请选择 2"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按回车！"
  read -p "Please enter your choice[0-2]: " input7
- case $input7 in 
+ case $input7 in
  1)
-  TIME y " >>>>>>>>>>>开始安装telethon"
+  TIME y " >>>>>>>>>>>开始安装 telethon"
   # 创建映射文件夹
   input_container_telethon1_config() {
-  echo -n -e "请输入telethon配置文件保存的绝对路径（示例：/home/telethon)，回车默认为当前目录: "
+  echo -n -e "请输入 telethon 配置文件保存的绝对路径（示例：/home/telethon)，回车默认为当前目录: "
   read tg_path
   if [ -z "$tg_path" ]; then
       TG_PATH=$TG_SHELL_FOLDER
@@ -1969,7 +1978,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装telethon"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 telethon"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -1993,18 +2002,18 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|         telethon启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         telethon 启动需要一点点时间，请耐心等待！       |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "| 使用教程https://hub.docker.com/r/kissyouhunter/telethon |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 2)  
-  TIME y " >>>>>>>>>>>开始安装telethon到N1的/mnt/mmcblk2p4/"
+ 2)
+  TIME y " >>>>>>>>>>>开始安装 telethon 到 N1 的 /mnt/mmcblk2p4/"
   # 创建映射文件夹
   input_container_telethon2_config() {
-  echo -n -e "请输入telethon存储的文件夹名称（如：telethon)，回车默认为 telethon: "
+  echo -n -e "请输入 telethon 存储的文件夹名称（如：telethon)，回车默认为 telethon: "
   read tg_path
   if [ -z "$tg_path" ]; then
       TG_PATH=$N1_TG_FOLDER
@@ -2017,7 +2026,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   CONFIG_PATH=$TG_PATH
   }
   input_container_telethon2_config
-  
+
   # 输入容器名
   input_container_telethon2_name() {
     echo -n -e "请输入将要创建的容器名[默认为：telethon]-> "
@@ -2052,7 +2061,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装telethon"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 telethon"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2076,15 +2085,15 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|         telethon启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         telethon 启动需要一点点时间，请耐心等待！       |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "| 使用教程https://hub.docker.com/r/kissyouhunter/telethon |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -2111,19 +2120,19 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-3]****|"
 TIME w "|************* ADGUARDHOME ************|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等（docker版）请选择 1"
-TIME w "(2) N1的EMMC上运行的openwrt（docker版）请选择 2"
+TIME w "(1) linxu系统、X86 的 openwrt、群辉等（docker 版）请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt（docker 版）请选择 2"
 TIME w "(3) linxu系统（非docker版，openwrt不可运行）"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按回车！"
  read -p "Please enter your choice[0-3]: " input8
- case $input8 in 
+ case $input8 in
  1)
-  TIME y " >>>>>>>>>>>开始安装adguardhome（docker版，x86系统）"
+  TIME y " >>>>>>>>>>>开始安装 adguardhome（docker 版，x86 系统）"
   # 创建映射文件夹
   input_container_adg1_config() {
-  echo -n -e "请输入adguardhome配置文件保存的绝对路径（示例：/home/adguardhome)，回车默认为当前目录: "
+  echo -n -e "请输入 adguardhome 配置文件保存的绝对路径（示例：/home/adguardhome)，回车默认为当前目录: "
   read adg_path
   if [ -z "$adg_path" ]; then
       ADG_PATH=$ADG_CONFIG_FOLDER
@@ -2174,7 +2183,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装adguardhome（docker版，x86系统）"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 adguardhome（docker 版，x86 系统）"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $WORK_PATH $CONF_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2199,18 +2208,18 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|       adguardhome启动需要一点点时间，请耐心等待！       |"
+    TIME g "|       adguardhome 启动需要一点点时间，请耐心等待！      |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "|            首次启动请访问宿主机 IP:3000                 |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 2)  
-  TIME y " >>>>>>>>>>>开始安装adguardhome（docker版）到N1的/mnt/mmcblk2p4/"
+ 2)
+  TIME y " >>>>>>>>>>>开始安装 adguardhome（docker 版）到 N1 的 /mnt/mmcblk2p4/"
   # 创建映射文件夹
   input_container_adg2_config() {
-  echo -n -e "请输入adguardhome存储文件名名称（示例：adguardhome)，回车默认为adguardhome: "
+  echo -n -e "请输入 adguardhome 存储文件名名称（示例：adguardhome)，回车默认为adguardhome: "
   read adg_path
   if [ -z "$adg_path" ]; then
       ADG_PATH=$N1_ADG_FOLDER
@@ -2261,7 +2270,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装adguardhome（docker版）到N1的/mnt/mmcblk2p4/"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 adguardhome（docker 版）到 N1 的 /mnt/mmcblk2p4/"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $WORK_PATH $CONF_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2293,20 +2302,20 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 3)  
-  TIME y " >>>>>>>>>>>开始安装adguardhome（非docker版）"
+ 3)
+  TIME y " >>>>>>>>>>>开始安装 adguardhome（非 docker 版）"
   apt update && apt install curl -y
   curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
     TIME g "-----------------------------------------------------------"
-    TIME g "|       adguardhome启动需要一点点时间，请耐心等待！       |"
+    TIME g "|       adguardhome 启动需要一点点时间，请耐心等待！      |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "|            首次启动请访问宿主机 IP:3000                 |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -2322,7 +2331,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
  ;;
  esac
  done
-;; 
+;;
 #安装x-ui
 9)
 clear
@@ -2333,13 +2342,13 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-3]****|"
 TIME w "|**************** X-UI ****************|"
 TIME w "----------------------------------------"
-TIME w "(1) x-ui为docer版本"
+TIME w "(1) x-ui 为 docker 版本"
 TIME b "(0) 返回上级菜单"
 #EOF
  read -p "Please enter your choice[0-1]: " input9
- case $input9 in 
+ case $input9 in
  1)
-  TIME y " >>>>>>>>>>>开始安装x-ui"
+  TIME y " >>>>>>>>>>>开始安装 x-ui"
   # 创建映射文件夹
   input_container_xui_config() {
   echo -n -e "请输入x-ui配置文件保存的绝对路径（示例：/home/x-ui)，回车默认为当前目录: "
@@ -2409,7 +2418,7 @@ TIME b "(0) 返回上级菜单"
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装x-ui"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 x-ui"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH $DB_PATH $CERT_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2434,15 +2443,15 @@ TIME b "(0) 返回上级菜单"
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|             x-ui启动需要一点点时间，请耐心等待！        |"
+    TIME g "|            x-ui 启动需要一点点时间，请耐心等待！        |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "|      默认账号：admin 默认密码：admin 默认端口：54321    |"
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -2473,18 +2482,18 @@ TIME w "----------------------------------------"
 TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|******** AAPANEL(宝塔国际版) *********|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
-TIME w "(2) N1的EMMC上运行的openwrt请选择 2"
+TIME w "(1) linxu系统、X86的 openwrt、群辉等请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt 请选择 2"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按回车！"
  read -p "Please enter your choice[0-2]: " input10
- case $input10 in 
+ case $input10 in
  1)
   TIME y " >>>>>>>>>>>开始安装aapanel"
   # 创建映射文件夹
   input_container_aapanel1_config() {
-  echo -n -e "请输入aapanel配置文件保存的绝对路径（示例：/home/aapanel)，回车默认为当前目录: "
+  echo -n -e "请输入 aapanel 配置文件保存的绝对路径（示例：/home/aapanel)，回车默认为当前目录: "
   read aapanel_path
   if [ -z "$aapanel_path" ]; then
       AAPANEL_PATH=$AAPANEL_CONFIG_FOLDER
@@ -2534,7 +2543,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装aapanel"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 aapanel"
   log "1.开始创建配置文件目录"
   PATH_LIST=($MYSQL_DATA_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2568,7 +2577,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|          aapanel启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         aapanel 启动需要一点点时间，请耐心等待！        |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "|            访问方式为 宿主机ip:8888/aapanel/            |"
@@ -2577,11 +2586,11 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 2)  
-  TIME y " >>>>>>>>>>>开始安装aapanel到N1的/mnt/mmcblk2p4/"
+ 2)
+  TIME y " >>>>>>>>>>>开始安装 aapanel 到 N1 的 /mnt/mmcblk2p4/"
   # 创建映射文件夹
   input_container_aapanel2_config() {
-  echo -n -e "请输入telethon存储的文件夹名称（如：aapanel)，回车默认为 aapanel: "
+  echo -n -e "请输入 aapanel 存储的文件夹名称（如：aapanel)，回车默认为 aapanel: "
   read aapanel_path
   if [ -z "$aapanel_path" ]; then
       AAPANEL_PATH=$N1_AAPANEL_FOLDER
@@ -2597,7 +2606,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   VHOST_PATH=$AAPANEL_PATH/vhost
   }
   input_container_aapanel2_config
-  
+
   # 输入容器名
   input_container_aapanel2_name() {
     echo -n -e "请输入将要创建的容器名[默认为：aapanel]-> "
@@ -2632,7 +2641,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装aapanel"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 aapanel"
   log "1.开始创建配置文件目录"
   PATH_LIST=($MYSQL_DATA_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2666,7 +2675,7 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
       log "列出所有宿主机上的容器"
       docker ps -a
     TIME g "-----------------------------------------------------------"
-    TIME g "|          aapanel启动需要一点点时间，请耐心等待！        |"
+    TIME g "|         aapanel 启动需要一点点时间，请耐心等待！        |"
     sleep 10
     TIME g "|                安装完成，自动退出脚本                   |"
     TIME g "|            访问方式为 宿主机ip:8888/aapanel/            |"
@@ -2675,8 +2684,8 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     TIME g "-----------------------------------------------------------"
   exit 0
   ;;
- 0) 
- clear 
+ 0)
+ clear
  break
  ;;
  *) TIME r "----------------------------------"
@@ -2700,22 +2709,21 @@ while [ "$flag" -eq 0 ]
 do
 #cat << EOF
 TIME w "----------------------------------------"
-TIME w "|****Please Enter Your Choice:[0-3]****|"
+TIME w "|****Please Enter Your Choice:[0-2]****|"
 TIME w "|************** MaiARK ****************|"
 TIME w "----------------------------------------"
-TIME w "(1) linxu系统、X86的openwrt、群辉等请选择 1"
-TIME w "(2) ARM CPU的linux系统、各种盒子的openwrt等请选择 2"
-TIME w "(3) N1的EMMC上运行的openwrt请选择 3"
+TIME w "(1) linxu系统、openwrt、群辉等请选择 1"
+TIME w "(2) N1 的 EMMC 上运行的 openwrt 请选择 2"
 TIME b "(0) 返回上级菜单"
 #EOF
 TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车！"
- read -p "Please enter your choice[0-3]: " input11
- case $input11 in 
+ read -p "Please enter your choice[0-2]: " input11
+ case $input11 in
  1)
-  TIME y " >>>>>>>>>>>开始安装MaiARK (AMD64 CPU)"
+  TIME y " >>>>>>>>>>>开始安装 MaiARK"
   # 创建映射文件夹
   input_container_maiark1_config() {
-  echo -n -e "请输入MaiARK配置文件保存的绝对路径（示例：/home/MaiARK)，回车默认为当前目录: "
+  echo -n -e "请输入 MaiARK 配置文件保存的绝对路径（示例：/home/MaiARK)，回车默认为当前目录: "
   read maiark_path
   if [ -z "$maiark_path" ]; then
       MAIARK_PATH=$MAIARK_CONFIG_FOLDER
@@ -2749,9 +2757,9 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
       NETWORK="host"
       MAIARK_PORT="8082"
   fi
-  
+
   if [ "$NETWORK" = "bridge" ]; then
-      inp "是否修改MaiMRK端口[默认 8082]：\n1) 修改\n2) 不修改[默认]"
+      inp "是否修改 MaiMRK 端口[默认 8082]：\n1) 修改\n2) 不修改[默认]"
       opt
       read change_maiark_port
       if [ "$change_maiark_port" = "1" ]; then
@@ -2771,6 +2779,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
   	TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
     TIME y "Maiark 端口：$MAIARK_PORT"
+    TIME r "确认下映射路径是否正确！！！"
   	read -r -p "以上信息是否正确？[Y/n] " input111
   	case $input111 in
   		[yY][eE][sS]|[yY])
@@ -2790,7 +2799,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   	esac
   done
 
-  TIME y " >>>>>>>>>>>配置完成，开始安装MaiARK"
+  TIME y " >>>>>>>>>>>配置完成，开始安装 MaiARK"
   log "1.开始创建配置文件目录"
   PATH_LIST=($CONFIG_PATH)
   for i in ${PATH_LIST[@]}; do
@@ -2798,7 +2807,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   done
 
   log "2.开始创建容器并执行"
-  docker pull $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_AMD
+  docker pull $MAIARK_DOCKER_IMG_NAME:$TAG
   docker run -d \
       -v $CONFIG_PATH:/MaiARK \
       --name $MAIARK_CONTAINER_NAME \
@@ -2806,7 +2815,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
       --restart always \
       --network $NETWORK \
       -p $MAIARK_PORT:8082 \
-      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_AMD
+      $MAIARK_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
           cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
@@ -2814,134 +2823,27 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
 
       log "列出所有宿主机上的容器"
       docker ps -a
-    TIME g "-----------------------------------------------------------"
-    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
+    TIME g "------------------------------------------------------------------------------"
+    TIME g "|                  MaiARK 启动需要一点点时间，请耐心等待！                   |"
     sleep 10
-    TIME g "|                安装完成，自动退出脚本                   |"
-    TIME g "|              访问方式为 宿主机ip:$MAIARK_PORT                   |"
-    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
-    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
-    TIME g "-----------------------------------------------------------"
+    TIME g "|                          安装完成，自动退出脚本                            |"
+    TIME g "|                          访问方式为 宿主机ip:$MAIARK_PORT                          |"
+    TIME g "|             请先配置好映射文件夹下的 arkconfig.json 再重启容器             |"
+    TIME r "| 桥接模式请不要修改 config 下的端口8082，host模式随意(前提是指定自己在干啥) |"
+    TIME r "|                请看清映射的文件夹路径去找 config 文件                      |"
+    TIME r "|   op用户出现“docker0: iptables: No chain/target/match by that name”错误    |"
+    TIME r "|              输入命令“/etc/init.d/dockerd restart” 重启 docker             |"
+    TIME r "|                     再输入“docker start $MAIARK_CONTAINER_NAME” 启动容器                   |"
+    TIME r "|       op用户出现容器正常启动，但web界面无法方法Turbo ACC 网络加速设置      |"
+    TIME r "|进入“网络——Turbo ACC 网络加速设置” 开启或关闭“全锥型 NAT”就可正常访问web界面|"
+    TIME g "------------------------------------------------------------------------------"
   exit 0
   ;;
  2)
-  TIME y " >>>>>>>>>>>开始安装MaiARK (ARM64 CPU)"
-  # 创建映射文件夹
-  input_container_maiark2_config() {
-  echo -n -e "请输入MaiARK配置文件保存的绝对路径（示例：/home/MaiARK)，回车默认为当前目录: "
-  read maiark_path
-  if [ -z "$maiark_path" ]; then
-      MAIARK_PATH=$MAIARK_CONFIG_FOLDER
-  elif [ -d "$maiark_path" ]; then
-      MAIARK_PATH=$maiark_path
-  else
-      MAIARK_PATH=$maiark_path
-  fi
-  CONFIG_PATH=$MAIARK_PATH
-  }
-  input_container_maiark2_config
-
-  # 输入容器名
-  input_container_maiark2_name() {
-    echo -n -e "请输入将要创建的容器名[默认为：maiark]-> "
-    read container_name
-    if [ -z "$container_name" ]; then
-        MAIARK_CONTAINER_NAME="maiark"
-    else
-        MAIARK_CONTAINER_NAME=$container_name
-    fi
-  }
-  input_container_maiark2_name
-
-  # 网络模式
-  input_container_maiark2_network_config() {
-  inp "请选择容器的网络类型：\n1) host\n2) bridge[默认]"
-  opt
-  read net
-  if [ "$net" = "1" ]; then
-      NETWORK="host"
-      MAIARK_PORT="8082"
-  fi
-  
-  if [ "$NETWORK" = "bridge" ]; then
-      inp "是否修改MaiMRK端口[默认 8082]：\n1) 修改\n2) 不修改[默认]"
-      opt
-      read change_maiark_port
-      if [ "$change_maiark_port" = "1" ]; then
-          echo -n -e "输入想修改的端口->"
-          read MAIARK_PORT
-      else
-          MAIARK_PORT="8082"
-      fi
-  fi
-  }
-  input_container_maiark2_network_config
-
-  # 确认
-  while true
-  do
-  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
-  	TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
-    TIME y "Maiark 端口：$MAIARK_PORT"
-  	read -r -p "以上信息是否正确？[Y/n] " input111
-  	case $input111 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_maiark2_config
-  			input_container_maiark2_name
-            input_container_maiark2_network_config
-            MAIARK_PORT="8082"
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
-  done
-
-  TIME y " >>>>>>>>>>>配置完成，开始安装MaiARK"
-  log "1.开始创建配置文件目录"
-  PATH_LIST=($CONFIG_PATH)
-  for i in ${PATH_LIST[@]}; do
-      mkdir -p $i
-  done
-
-  log "2.开始创建容器并执行"
-  docker pull $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
-  docker run -dit \
-      -t \
-      -v $CONFIG_PATH:/MaiARK \
-      --name $MAIARK_CONTAINER_NAME \
-      --hostname $MAIARK_CONTAINER_NAME \
-      --restart always \
-      --network $NETWORK \
-      -p $MAIARK_PORT:8082 \
-      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
-
-      if [ $? -ne 0 ] ; then
-          cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
-      fi
-
-      log "列出所有宿主机上的容器"
-      docker ps -a
-    TIME g "-----------------------------------------------------------"
-    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
-    sleep 10
-    TIME g "|                安装完成，自动退出脚本                   |"
-    TIME g "|              访问方式为 宿主机ip:$MAIARK_PORT                   |"
-    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
-    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
-    TIME g "-----------------------------------------------------------"
-  exit 0
-  ;;
- 3)  
-  TIME y " >>>>>>>>>>>开始安装MaiARK到N1的/mnt/mmcblk2p4/"
+  TIME y " >>>>>>>>>>>开始安装 MaiARK 到 N1 的 /mnt/mmcblk2p4/"
   # 创建映射文件夹
   input_container_maiark3_config() {
-  echo -n -e "请输入MaiARK存储的文件夹名称（如：MaiARK)，回车默认为 MaiARK: "
+  echo -n -e "请输入 MaiARK 存储的文件夹名称（如：MaiARK)，回车默认为 MaiARK: "
   read maiark_path
   if [ -z "$maiark_path" ]; then
       MAIARK_PATH=$N1_MAIARK_FOLDER
@@ -2953,7 +2855,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   CONFIG_PATH=$MAIARK_PATH
   }
   input_container_maiark3_config
-  
+
   # 输入容器名
   input_container_maiark3_name() {
     echo -n -e "请输入将要创建的容器名[默认为：maiark]-> "
@@ -2975,9 +2877,9 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
       NETWORK="host"
       MAIARK_PORT="8082"
   fi
-  
+
   if [ "$NETWORK" = "bridge" ]; then
-      inp "是否修改MaiMRK端口[默认 8082]：\n1) 修改\n2) 不修改[默认]"
+      inp "是否修改 MaiMRK 端口[默认 8082]：\n1) 修改\n2) 不修改[默认]"
       opt
       read change_maiark_port
       if [ "$change_maiark_port" = "1" ]; then
@@ -2997,6 +2899,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
   	TIME y "MaiARK 容器名：$MAIARK_CONTAINER_NAME"
     TIME y "Maiark 端口：$MAIARK_PORT"
+    TIME r "确认下映射路径是否正确！！！"
   	read -r -p "以上信息是否正确？[Y/n] " input113
   	case $input113 in
   		[yY][eE][sS]|[yY])
@@ -3024,7 +2927,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   done
 
   log "3.开始创建容器并执行"
-  docker pull $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
+  docker pull $MAIARK_DOCKER_IMG_NAME:$TAG
   docker run -dit \
       -t \
       -v $CONFIG_PATH:/MaiARK \
@@ -3033,7 +2936,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
       --restart always \
       --network $NETWORK \
       -p $MAIARK_PORT:8082 \
-      $MAIARK_DOCKER_IMG_NAME:$MAIARK_TAG_ARM
+      $MAIARK_DOCKER_IMG_NAME:$TAG
 
       if [ $? -ne 0 ] ; then
           cancelrun "** 错误：容器创建失败，请翻译以上英文报错，Google/百度尝试解决问题！"
@@ -3041,14 +2944,20 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
 
       log "列出所有宿主机上的容器"
       docker ps -a
-    TIME g "-----------------------------------------------------------"
-    TIME g "|           MaiARK启动需要一点点时间，请耐心等待！        |"
+    TIME g "------------------------------------------------------------------------------"
+    TIME g "|                  MaiARK 启动需要一点点时间，请耐心等待！                   |"
     sleep 10
-    TIME g "|                安装完成，自动退出脚本                   |"
-    TIME g "|              访问方式为 宿主机ip:$MAIARK_PORT                   |"
-    TIME g "|    请先配置好映射文件夹下的arkconfig.json再重启容器     |"
-    TIME g "|   基础教程 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    |"
-    TIME g "-----------------------------------------------------------"
+    TIME g "|                          安装完成，自动退出脚本                            |"
+    TIME g "|                          访问方式为 宿主机ip:$MAIARK_PORT                          |"
+    TIME g "|             请先配置好映射文件夹下的 arkconfig.json 再重启容器             |"
+    TIME r "| 桥接模式请不要修改 config 下的端口8082，host模式随意(前提是指定自己在干啥) |"
+    TIME r "|                请看清映射的文件夹路径去找 config 文件                      |"
+    TIME r "|   op用户出现“docker0: iptables: No chain/target/match by that name”错误    |"
+    TIME r "|              输入命令“/etc/init.d/dockerd restart” 重启 docker             |"
+    TIME r "|                     再输入“docker start $MAIARK_CONTAINER_NAME” 启动容器                   |"
+    TIME r "|       op用户出现容器正常启动，但web界面无法方法Turbo ACC 网络加速设置      |"
+    TIME r "|进入“网络——Turbo ACC 网络加速设置” 开启或关闭“全锥型 NAT”就可正常访问web界面|"
+    TIME g "------------------------------------------------------------------------------"
   exit 0
   ;;
  0) 
