@@ -37,7 +37,7 @@ on:
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
-  BASE_KERNEL: 5.10.121
+  BASE_KERNEL: 5.10.129
 
 jobs:
   build:
