@@ -80,7 +80,7 @@ build_armbian=(
 # Set Armbian firmware size (Unit: MiB, SKIP_MB >= 4, BOOT_MB >= 256, ROOT_MB >= 2000)
 SKIP_MB="68"
 BOOT_MB="256"
-ROOT_MB="2748"
+ROOT_MB="7748"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 ROOTFS_TYPE="ext4"
 # Custom name in firmware name: ${build_image_file}, e.g. _server or _gnome_desktop
