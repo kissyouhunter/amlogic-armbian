@@ -79,8 +79,8 @@ if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; th
 		LATEST_VERSION_K15_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.15.[0-9]+"  | sed -e "s/5.15.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K15="5.15.${LATEST_VERSION_K15_LATEST}"
 
-        echo  "The latest version on the server is: [ ${LATEST_VERSION_K419} / ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
-		echo  "最新的内核版本为: [ ${LATEST_VERSION_K419} / ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
+        echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
+		echo  "最新的内核版本为: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} ]"
         echo  "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
 		echo  "请输入内核版本号,例如: ${LATEST_VERSION_K4}"
         read  KERNEL_NUM
