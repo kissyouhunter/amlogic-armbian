@@ -127,20 +127,20 @@ cancelrun() {
 
 TIME() {
 [[ -z "$1" ]] && {
-	echo -ne " "
+  echo -ne " "
 } || {
      case $1 in
-	r) export Color="\e[31;1m";;
-	g) export Color="\e[32;1m";;
-	b) export Color="\e[34;1m";;
-	y) export Color="\e[33;1m";;
-	z) export Color="\e[35;1m";;
-	l) export Color="\e[36;1m";;
-	w) export Color="\e[29;1m";;
+  r) export Color="\e[31;1m";;
+  g) export Color="\e[32;1m";;
+  b) export Color="\e[34;1m";;
+  y) export Color="\e[33;1m";;
+  z) export Color="\e[35;1m";;
+  l) export Color="\e[36;1m";;
+  w) export Color="\e[29;1m";;
       esac
-	[[ $# -lt 2 ]] && echo -e "\e[36m\e[0m ${1}" || {
-		echo -e "\e[36m\e[0m ${Color}${2}\e[0m"
-	 }
+  [[ $# -lt 2 ]] && echo -e "\e[36m\e[0m ${1}" || {
+    echo -e "\e[36m\e[0m ${Color}${2}\e[0m"
+   }
       }
 }
 
@@ -192,10 +192,10 @@ TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具�
     if [ "$lsb_dist" == "openwrt" ]; then
         TIME r "****openwrt 宿主机请选择 2 或者 3 安装 docker****"
     else
-		sleep 1
+    sleep 1
         bash <(curl -s -S -L https://raw.githubusercontent.com/kissyouhunter/Tools/main/docker-and-docker_compose.sh)
         TIME g "****docker和docker-compose安装完成，请返回上级菜单!****"
-	    sleep 5
+      sleep 5
     fi
   ;;
  2)
@@ -267,9 +267,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     if [ "$NETWORK" = "host" ]; then
-    		TIME g "|            访问方式为 宿主机ip:5700               |"
+        TIME g "|            访问方式为 宿主机ip:5700               |"
     elif [ "$NETWORK" = "bridge" ]; then
-    		TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
+        TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
     fi
     TIME g "-----------------------------------------------------"
     exit 0
@@ -279,33 +279,33 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   input_container_ql1_check() {
   while true
   do
-  	TIME y "青龙配置文件路径：$QL_PATH"
-  	TIME y "青龙容器名：$QL_CONTAINER_NAME"
-  	TIME y "青龙网络类型：$NETWORK"
+    TIME y "青龙配置文件路径：$QL_PATH"
+    TIME y "青龙容器名：$QL_CONTAINER_NAME"
+    TIME y "青龙网络类型：$NETWORK"
     TIME y "青龙版本：$TAG"
-  	if [ "$NETWORK" = "host" ]; then
-  		TIME y "青龙面板端口：5700"
-  	elif [ "$NETWORK" = "bridge" ]; then
-  		TIME y "青龙面板端口：$QL_PORT"
-  	fi
-  	read -r -p "以上信息是否正确？[Y/n] " input21
-  	case $input21 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			QL_PORT="5700"
+    if [ "$NETWORK" = "host" ]; then
+      TIME y "青龙面板端口：5700"
+    elif [ "$NETWORK" = "bridge" ]; then
+      TIME y "青龙面板端口：$QL_PORT"
+    fi
+    read -r -p "以上信息是否正确？[Y/n] " input21
+    case $input21 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        QL_PORT="5700"
             TAG="latest"
-  			input_container_ql1_version
+        input_container_ql1_version
             input_container_ql1_judge
             input_container_ql1_info
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
   }
 
@@ -480,9 +480,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     if [ "$NETWORK" = "host" ]; then
-    		TIME g "|            访问方式为 宿主机ip:5700               |"
+        TIME g "|            访问方式为 宿主机ip:5700               |"
     elif [ "$NETWORK" = "bridge" ]; then
-    		TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
+        TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
     fi
     TIME g "-----------------------------------------------------"
   exit 0
@@ -498,9 +498,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     if [ "$NETWORK" = "host" ]; then
-    		TIME g "|            访问方式为 宿主机ip:5700               |"
+        TIME g "|            访问方式为 宿主机ip:5700               |"
     elif [ "$NETWORK" = "bridge" ]; then
-    		TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
+        TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
     fi
     TIME g "-----------------------------------------------------"
     exit 0
@@ -510,33 +510,33 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   input_container_ql2_check() {
   while true
   do
-  	TIME y "青龙配置文件路径：$QL_PATH"
-  	TIME y "青龙容器名：$QL_CONTAINER_NAME"
-  	TIME y "青龙网络类型：$NETWORK"
+    TIME y "青龙配置文件路径：$QL_PATH"
+    TIME y "青龙容器名：$QL_CONTAINER_NAME"
+    TIME y "青龙网络类型：$NETWORK"
     TIME y "青龙版本：$TAG"
-  	if [ "$NETWORK" = "host" ]; then
-  		TIME y "青龙面板端口：5700"
-  	elif [ "$NETWORK" = "bridge" ]; then
-  		TIME y "青龙面板端口：$QL_PORT"
-  	fi
-  	read -r -p "以上信息是否正确？[Y/n] " input21
-  	case $input21 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			QL_PORT="5700"
+    if [ "$NETWORK" = "host" ]; then
+      TIME y "青龙面板端口：5700"
+    elif [ "$NETWORK" = "bridge" ]; then
+      TIME y "青龙面板端口：$QL_PORT"
+    fi
+    read -r -p "以上信息是否正确？[Y/n] " input21
+    case $input21 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        QL_PORT="5700"
             TAG="latest"
-  			input_container_ql2_version
+        input_container_ql2_version
             input_container_ql2_judge
             input_container_ql2_info
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
   }
 
@@ -710,9 +710,9 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
     sleep 10
     TIME g "|             安装完成，自动退出脚本                |"
     if [ "$NETWORK" = "host" ]; then
-    		TIME g "|            访问方式为 宿主机ip:5700               |"
+        TIME g "|            访问方式为 宿主机ip:5700               |"
     elif [ "$NETWORK" = "bridge" ]; then
-    		TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
+        TIME g "|            访问方式为 宿主机ip:$QL_PORT               |"
     fi
     TIME g "-----------------------------------------------------"
   exit 0
@@ -827,32 +827,32 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "elecv2p 配置文件路径：$V2P_PATH"
-  	TIME y "elecv2p 容器名：$V2P_CONTAINER_NAME"
-  	TIME y "elecv2p 面板端口：$V2P_PORT"
-  	TIME y "elecv2p anyproxy端口：$V2P_PORT1"
-  	TIME y "elecv2p 网络请求查看端口：$V2P_PORT2"
-  	read -r -p "以上信息是否正确？[Y/n] " input32
-  	case $input32 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			V2P_PORT="8100"
-  			V2P_PORT1="8101"
-  			V2P_PORT2="8102"
-  			input_container_v2p1_config
-  			input_container_v2p1_name
-  			input_container_v2p1_webui_config
-  			input_container_v2p1_anyproxy_config
-  			input_container_v2p1_http_config
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "elecv2p 配置文件路径：$V2P_PATH"
+    TIME y "elecv2p 容器名：$V2P_CONTAINER_NAME"
+    TIME y "elecv2p 面板端口：$V2P_PORT"
+    TIME y "elecv2p anyproxy端口：$V2P_PORT1"
+    TIME y "elecv2p 网络请求查看端口：$V2P_PORT2"
+    read -r -p "以上信息是否正确？[Y/n] " input32
+    case $input32 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        V2P_PORT="8100"
+        V2P_PORT1="8101"
+        V2P_PORT2="8102"
+        input_container_v2p1_config
+        input_container_v2p1_name
+        input_container_v2p1_webui_config
+        input_container_v2p1_anyproxy_config
+        input_container_v2p1_http_config
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 elecv2p"
@@ -967,32 +967,32 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "elecv2p 配置文件路径：$V2P_PATH"
-  	TIME y "elecv2p 容器名：$V2P_CONTAINER_NAME"
-  	TIME y "elecv2p 面板端口：$V2P_PORT"
-  	TIME y "elecv2p anyproxy端口：$V2P_PORT1"
-  	TIME y "elecv2p 网络请求查看端口：$V2P_PORT2"
-  	read -r -p "以上信息是否正确？[Y/n] " input32
-  	case $input32 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			V2P_PORT="8100"
-  			V2P_PORT1="8101"
-  			V2P_PORT2="8102"
-  			input_container_v2p2_config
-  			input_container_v2p2_name
-  			input_container_v2p2_webui_config
-  			input_container_v2p2_anyproxy_config
-  			input_container_v2p2_http_config
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "elecv2p 配置文件路径：$V2P_PATH"
+    TIME y "elecv2p 容器名：$V2P_CONTAINER_NAME"
+    TIME y "elecv2p 面板端口：$V2P_PORT"
+    TIME y "elecv2p anyproxy端口：$V2P_PORT1"
+    TIME y "elecv2p 网络请求查看端口：$V2P_PORT2"
+    read -r -p "以上信息是否正确？[Y/n] " input32
+    case $input32 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        V2P_PORT="8100"
+        V2P_PORT1="8101"
+        V2P_PORT2="8102"
+        input_container_v2p2_config
+        input_container_v2p2_name
+        input_container_v2p2_webui_config
+        input_container_v2p2_anyproxy_config
+        input_container_v2p2_http_config
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 elecv2p"
@@ -1254,31 +1254,31 @@ TIME r "<注>请使用 root 账户部署容器"
   # 确认
   while true
   do
-  	TIME y "emby 配置文件路径：$CONFIG_PATH"
-  	TIME y "emby 电影文件路径：$MOVIES_PATH"
-  	TIME y "emby 电视剧文件路径：$TVSHOWS_PATH"
-  	TIME y "emby 容器名：$EMBY_CONTAINER_NAME"
-  	TIME y "emby 面板端口：$EMBY_PORT"
-  	TIME y "emby https 端口：$EMBY_PORT1"
-  	read -r -p "以上信息是否正确？[Y/n] " input51
-  	case $input51 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			EMBY_PORT="8096"
-  			EMBY_PORT1="8920"
-  			input_container_emby_config
-  			input_container_emby_name
-  			input_container_emby_webui_config
-  			input_container_emby_https_config
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "emby 配置文件路径：$CONFIG_PATH"
+    TIME y "emby 电影文件路径：$MOVIES_PATH"
+    TIME y "emby 电视剧文件路径：$TVSHOWS_PATH"
+    TIME y "emby 容器名：$EMBY_CONTAINER_NAME"
+    TIME y "emby 面板端口：$EMBY_PORT"
+    TIME y "emby https 端口：$EMBY_PORT1"
+    read -r -p "以上信息是否正确？[Y/n] " input51
+    case $input51 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        EMBY_PORT="8096"
+        EMBY_PORT1="8920"
+        input_container_emby_config
+        input_container_emby_name
+        input_container_emby_webui_config
+        input_container_emby_https_config
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 emby"
@@ -1414,31 +1414,31 @@ TIME r "<注>请使用 root 账户部署容器"
   # 确认
   while true
   do
-  	TIME y "jellyfin 配置文件路径：$CONFIG_PATH"
-  	TIME y "jellyfin 电影文件路径：$MOVIES_PATH"
-  	TIME y "jellyfin 电视剧文件路径：$TVSHOWS_PATH"
-  	TIME y "jellyfin 容器名：$JELLYFIN_CONTAINER_NAME"
-  	TIME y "jellyfin 面板端口：$JELLYFIN_PORT"
-  	TIME y "jellyfin https端口：$JELLYFIN_PORT1"
-  	read -r -p "以上信息是否正确？[Y/n] " input52
-  	case $input52 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			JELLYFIN_PORT="8096"
-  			JELLYFIN_PORT1="8920"
-  			input_container_jellyfin_config
-  			input_container_jellyfin_name
-  			input_container_jellyfin_webui_config
-  			input_container_jellyfin_https_config
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "jellyfin 配置文件路径：$CONFIG_PATH"
+    TIME y "jellyfin 电影文件路径：$MOVIES_PATH"
+    TIME y "jellyfin 电视剧文件路径：$TVSHOWS_PATH"
+    TIME y "jellyfin 容器名：$JELLYFIN_CONTAINER_NAME"
+    TIME y "jellyfin 面板端口：$JELLYFIN_PORT"
+    TIME y "jellyfin https端口：$JELLYFIN_PORT1"
+    read -r -p "以上信息是否正确？[Y/n] " input52
+    case $input52 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        JELLYFIN_PORT="8096"
+        JELLYFIN_PORT1="8920"
+        input_container_jellyfin_config
+        input_container_jellyfin_name
+        input_container_jellyfin_webui_config
+        input_container_jellyfin_https_config
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 jellyfin"
@@ -1577,24 +1577,24 @@ TIME r "<注> aria2 和 aria2-pro 二选一"
   # 确认
   while true
   do
-  	TIME y "qbittorrent 配置文件路径：$QB_PATH"
-  	TIME y "qbittorrent 下载文件路径：$DOWNLOADS_PATH"
-  	TIME y "qbittorrent 容器名：$QB_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input61
-  	case $input61 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_qb_config
-  			input_container_qb_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "qbittorrent 配置文件路径：$QB_PATH"
+    TIME y "qbittorrent 下载文件路径：$DOWNLOADS_PATH"
+    TIME y "qbittorrent 容器名：$QB_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input61
+    case $input61 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_qb_config
+        input_container_qb_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 qbittorrent 增强版"
@@ -1689,26 +1689,26 @@ TIME r "<注> aria2 和 aria2-pro 二选一"
   # 确认
   while true
   do
-  	TIME y "aria2 配置文件路径：$ARIA2_PATH"
-  	TIME y "aria2 下载文件路径：$DOWNLOADS_PATH"
-  	TIME y "aria2 容器名：$ARIA2_CONTAINER_NAME"
-  	TIME y "aria2 密钥：$TOKEN"
-  	read -r -p "以上信息是否正确？[Y/n] " input62
-  	case $input62 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_aria2_config
-  			input_container_aria2_name
-  			input_container_aria2_token
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "aria2 配置文件路径：$ARIA2_PATH"
+    TIME y "aria2 下载文件路径：$DOWNLOADS_PATH"
+    TIME y "aria2 容器名：$ARIA2_CONTAINER_NAME"
+    TIME y "aria2 密钥：$TOKEN"
+    read -r -p "以上信息是否正确？[Y/n] " input62
+    case $input62 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_aria2_config
+        input_container_aria2_name
+        input_container_aria2_token
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 aria2"
@@ -1823,28 +1823,28 @@ TIME r "<注> aria2 和 aria2-pro 二选一"
   # 确认
   while true
   do
-  	TIME y "aria2_pro 配置文件路径：$ARIA2_PRO_PATH"
-  	TIME y "aria2_pro 下载文件路径：$DOWNLOADS_PATH"
-  	TIME y "aria2_pro 容器名：$ARIA2_PRO_CONTAINER_NAME"
-  	TIME y "aria2_pro 面板名：$ARIA2_PRO_WEBUI_NAME"
-  	TIME y "aria2_pro 密钥：$TOKEN"
-  	read -r -p "以上信息是否正确？[Y/n] " input63
-  	case $input63 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_aria2_pro_config
-  			input_container_aria2_pro_name
-  			input_container_ariang_name
-  			input_container_aria2_pro_token
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "aria2_pro 配置文件路径：$ARIA2_PRO_PATH"
+    TIME y "aria2_pro 下载文件路径：$DOWNLOADS_PATH"
+    TIME y "aria2_pro 容器名：$ARIA2_PRO_CONTAINER_NAME"
+    TIME y "aria2_pro 面板名：$ARIA2_PRO_WEBUI_NAME"
+    TIME y "aria2_pro 密钥：$TOKEN"
+    read -r -p "以上信息是否正确？[Y/n] " input63
+    case $input63 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_aria2_pro_config
+        input_container_aria2_pro_name
+        input_container_ariang_name
+        input_container_aria2_pro_token
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 aria2-pro"
@@ -1965,23 +1965,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "telethon 配置文件路径：$CONFIG_PATH"
-  	TIME y "telethon 容器名：$TG_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input71
-  	case $input71 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_telethon1_config
-  			input_container_telethon1_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "telethon 配置文件路径：$CONFIG_PATH"
+    TIME y "telethon 容器名：$TG_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input71
+    case $input71 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_telethon1_config
+        input_container_telethon1_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 telethon"
@@ -2047,23 +2047,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "telethon 配置文件路径：$CONFIG_PATH"
-  	TIME y "telethon 容器名：$TG_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input72
-  	case $input72 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_telethon2_config
-  			input_container_telethon2_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "telethon 配置文件路径：$CONFIG_PATH"
+    TIME y "telethon 容器名：$TG_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input72
+    case $input72 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_telethon2_config
+        input_container_telethon2_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 telethon"
@@ -2168,23 +2168,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "adguardhome 配置文件路径：$CONFIG_PATH"
-  	TIME y "adguardhome 容器名：$ADG_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input81
-  	case $input81 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_adg1_config
-  			input_container_adg1_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "adguardhome 配置文件路径：$CONFIG_PATH"
+    TIME y "adguardhome 容器名：$ADG_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input81
+    case $input81 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_adg1_config
+        input_container_adg1_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 adguardhome（docker 版，x86 系统）"
@@ -2254,23 +2254,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "adguardhome 配置文件路径：$CONFIG_PATH"
-  	TIME y "adguardhome 容器名：$ADG_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input82
-  	case $input82 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_adg2_config
-  			input_container_adg2_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "adguardhome 配置文件路径：$CONFIG_PATH"
+    TIME y "adguardhome 容器名：$ADG_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input82
+    case $input82 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_adg2_config
+        input_container_adg2_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 adguardhome（docker 版）到 N1 的 /mnt/mmcblk2p4/"
@@ -2400,25 +2400,25 @@ TIME b "(0) 返回上级菜单"
   # 确认
   while true
   do
-  	TIME y "x-ui 配置文件路径：$CONFIG_PATH"
-  	TIME y "x-ui 容器名：$XUI_CONTAINER_NAME"
+    TIME y "x-ui 配置文件路径：$CONFIG_PATH"
+    TIME y "x-ui 容器名：$XUI_CONTAINER_NAME"
     TIME y "x-ui 镜像版本：$XUI_IMAGE_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input91
-  	case $input91 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_xui_config
-  			input_container_xui_name
+    read -r -p "以上信息是否正确？[Y/n] " input91
+    case $input91 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_xui_config
+        input_container_xui_name
             input_container_xui_image
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 x-ui"
@@ -2531,23 +2531,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "aapanel 配置文件路径：$CONFIG_PATH"
-  	TIME y "aapanel 容器名：$AAPANEL_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input101
-  	case $input101 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_aapanel1_config
-  			input_container_aapanel1_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "aapanel 配置文件路径：$CONFIG_PATH"
+    TIME y "aapanel 容器名：$AAPANEL_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input101
+    case $input101 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_aapanel1_config
+        input_container_aapanel1_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 aapanel"
@@ -2628,23 +2628,23 @@ TIME r "<注>选择1或2后，如果不明白如何选择或输入，请狂按�
   # 确认
   while true
   do
-  	TIME y "aapanel 配置文件路径：$CONFIG_PATH"
-  	TIME y "aapanel 容器名：$AAPANEL_CONTAINER_NAME"
-  	read -r -p "以上信息是否正确？[Y/n] " input102
-  	case $input102 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_aapanel2_config
-  			input_container_aapanel2_name
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+    TIME y "aapanel 配置文件路径：$CONFIG_PATH"
+    TIME y "aapanel 容器名：$AAPANEL_CONTAINER_NAME"
+    read -r -p "以上信息是否正确？[Y/n] " input102
+    case $input102 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_aapanel2_config
+        input_container_aapanel2_name
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 aapanel"
@@ -2781,27 +2781,27 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   # 确认
   while true
   do
-  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
-  	TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
+    TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
+    TIME y "Maiark 容器名：$MAIARK_CONTAINER_NAME"
     TIME y "Maiark 端口：$MAIARK_PORT"
     TIME r "确认下映射路径是否正确！！！"
-  	read -r -p "以上信息是否正确？[Y/n] " input111
-  	case $input111 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_maiark1_config
-  			input_container_maiark1_name
+    read -r -p "以上信息是否正确？[Y/n] " input111
+    case $input111 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_maiark1_config
+        input_container_maiark1_name
             input_container_maiark1_network_config
             MAIARK_PORT="8082"
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 MaiARK"
@@ -2901,27 +2901,27 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   # 确认
   while true
   do
-  	TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
-  	TIME y "MaiARK 容器名：$MAIARK_CONTAINER_NAME"
+    TIME y "MaiARK 配置文件路径：$CONFIG_PATH"
+    TIME y "MaiARK 容器名：$MAIARK_CONTAINER_NAME"
     TIME y "Maiark 端口：$MAIARK_PORT"
     TIME r "确认下映射路径是否正确！！！"
-  	read -r -p "以上信息是否正确？[Y/n] " input113
-  	case $input113 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_maiark3_config
-  			input_container_maiark3_name
+    read -r -p "以上信息是否正确？[Y/n] " input113
+    case $input113 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_maiark3_config
+        input_container_maiark3_name
             input_container_maiark3_network_config
             MAIARK_PORT="8082"
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 MaiARK"
@@ -3356,29 +3356,29 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   # 确认
   while true
   do
-  	TIME y "Flame 配置文件路径：$CONFIG_PATH"
-  	TIME y "Flame 容器名：$FLAME_CONTAINER_NAME"
+    TIME y "Flame 配置文件路径：$CONFIG_PATH"
+    TIME y "Flame 容器名：$FLAME_CONTAINER_NAME"
     TIME y "Flame 端口：$FLAME_PORT"
     TIME y "Flame 密码：$FLAME_PASSWORD"
     TIME r "确认下映射路径是否正确！！！"
-  	read -r -p "以上信息是否正确？[Y/n] " input111
-  	case $input111 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_flame1_config
-  			input_container_flame1_name
+    read -r -p "以上信息是否正确？[Y/n] " input111
+    case $input111 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_flame1_config
+        input_container_flame1_name
             input_container_flame1_network_config
             FLAME_PORT="5005"
             FLAME_PASSWORD="flame"
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 FLAME"
@@ -3482,29 +3482,29 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   # 确认
   while true
   do
-  	TIME y "FLAME 配置文件路径：$CONFIG_PATH"
-  	TIME y "FLAME 容器名：$FLAME_CONTAINER_NAME"
+    TIME y "FLAME 配置文件路径：$CONFIG_PATH"
+    TIME y "FLAME 容器名：$FLAME_CONTAINER_NAME"
     TIME y "FLAME 端口：$FLAME_PORT"
     TIME y "Flame 密码：$FLAME_PASSWORD"
     TIME r "确认下映射路径是否正确！！！"
-  	read -r -p "以上信息是否正确？[Y/n] " input113
-  	case $input113 in
-  		[yY][eE][sS]|[yY])
-  			break
-  			;;
-  		[nN][oO]|[nN])
-  			TIME w "即将返回上一步"
-  			sleep 1
-  			input_container_flame2_config
-  			input_container_flame2_name
+    read -r -p "以上信息是否正确？[Y/n] " input113
+    case $input113 in
+      [yY][eE][sS]|[yY])
+        break
+        ;;
+      [nN][oO]|[nN])
+        TIME w "即将返回上一步"
+        sleep 1
+        input_container_flame2_config
+        input_container_flame2_name
             input_container_flame2_network_config
             FLAME_PORT="5005"
             FLAME_PASSWORD="flame"
-  			;;
-  		*)
-  			TIME r "输入错误，请输入[Y/n]"
-  			;;
-  	esac
+        ;;
+      *)
+        TIME r "输入错误，请输入[Y/n]"
+        ;;
+    esac
   done
 
   TIME y " >>>>>>>>>>>配置完成，开始安装 FLAME"
