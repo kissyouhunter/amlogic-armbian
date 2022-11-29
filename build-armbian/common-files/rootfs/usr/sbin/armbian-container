@@ -201,9 +201,9 @@ TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具�
  2)
     TIME y " >>>>>>>>>>>开始为 X86 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-2010.12-1_x86_64.zip
-    unzip docker-2010.12-1_x86_64.zip && rm -f docker-2010.12-1_x86_64.zip
-    cd /tmp/upload/docker-2010.12-1_x86_64 && opkg install *.ipk && cd .. && rm -rf docker-2010.12-1_x86_64/
+    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.17-1_x86_64.zip
+    unzip docker-20.10.17-1_x86_64.zip && rm -f docker-20.10.17-1_x86_64.zip
+    cd /tmp/upload/docker-20.10.17-1_x86_64 && opkg install *.ipk && cd .. && rm -rf docker-20.10.17-1_x86_64/
     docker -v && docker-compose -v
     TIME g "****docker安装完成，请返回上级菜单!****"
     sleep 5
@@ -211,10 +211,10 @@ TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具�
  3)
     TIME y " >>>>>>>>>>>开始为 Arm64 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.15-1_aarch64.zip
-    unzip docker-20.10.15-1_aarch64.zip && rm -f docker-20.10.15-1_aarch64.zip
-    cd /tmp/upload/docker-20.10.15-1_aarch64 && opkg install *.ipk
-    cd /tmp/upload && rm -rf docker-20.10.15-1_aarch64/
+    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.17-1_aarch64.zip
+    unzip docker-20.10.17-1_aarch64.zip && rm -f docker-20.10.17-1_aarch64.zip
+    cd /tmp/upload/docker-20.10.17-1_aarch64 && opkg install *.ipk
+    cd /tmp/upload && rm -rf docker-20.10.17-1_aarch64/
     docker -v && docker-compose -v
     TIME g "****docker 安装完成，请返回上级菜单!****"
     TIME g "****U盘上运行的 OP ，如果 docker 空间没有指定到 /mnt/sda4/docker ，请修改****"
@@ -3339,7 +3339,7 @@ TIME r "<注>选择后，如果不明白如何选择或输入，请狂按回车�
   fi
   
   if [ "$NETWORK" = "bridge" ]; then
-      inp "是否修改 MaiMRK 端口[默认 5005]：\n1) 修改\n2) 不修改[默认]"
+      inp "是否修改 FLAME 端口[默认 5005]：\n1) 修改\n2) 不修改[默认]"
       opt
       read change_flame_port
       if [ "$change_flame_port" = "1" ]; then
