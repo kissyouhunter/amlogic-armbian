@@ -32,6 +32,7 @@ on:
 
 env:
   TZ: Asia/Shanghai
+  SERVERCHAN_SCKEY: true
 
 jobs:
   build:

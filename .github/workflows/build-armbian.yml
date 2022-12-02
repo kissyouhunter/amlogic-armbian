@@ -51,6 +51,7 @@ on:
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
+  SERVERCHAN_SCKEY: true
 
 jobs:
   build:
