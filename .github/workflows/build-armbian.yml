@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Initialization environment
         env:
@@ -155,14 +155,27 @@ jobs:
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
           cd build/output/images/ && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
+          mkdir -p armbian && mkdir -p armbian_n1
+          mv -v Armbian_*-trunk_*.img.gz armbian/
+          mv -v Armbian_*_Aml_s905d_*.img.gz armbian_n1/
+          echo "ARMBIAN_NAME=$(ls armbian)" >> $GITHUB_ENV
+          echo "ARMBIAN_N1_NAME=$(ls armbian_n1)" >> $GITHUB_ENV
           echo "FILE_DATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+          echo "status=success" >> $GITHUB_OUTPUT
 
-      - name: Upload Armbian image to Actions
-        uses: kittaakos/upload-artifact-as-is@master
+      - name: Upload Armbian image
+        uses: actions/upload-artifact@master
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         with:
-          path: ${{ env.FILEPATH }}/
+          name: ${{ env.ARMBIAN_NAME }}
+          path: ${{ env.FILEPATH }}/armbian
+
+      - name: Upload N1 Armbian image
+        uses: actions/upload-artifact@master
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        with:
+          name: ${{ env.ARMBIAN_N1_NAME }}
+          path: ${{ env.FILEPATH }}/armbian_n1
 
       - name: telegram_bot
         run: |
