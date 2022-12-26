@@ -144,7 +144,7 @@ jobs:
           sudo chmod +x compile.sh
           sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP_STR }} \
                             HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
-          echo "::set-output name=status::success"
+          echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Rebuild Armbian for Amlogic s9xxx
         id: rebuild
@@ -156,7 +156,7 @@ jobs:
           cd build/output/images/ && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           sudo mkdir -p armbian && sudo mkdir -p armbian_n1
-          sudo chmod -R 777 *
+          sudo chmod -R 777 armbian armbian_n1 *.img.gz
           mv -v Armbian_*-trunk_*.img.gz armbian/
           mv -v Armbian_*_Aml_s905d_*.img.gz armbian_n1/
           echo "ARMBIAN_NAME=$(ls armbian)" >> $GITHUB_ENV
