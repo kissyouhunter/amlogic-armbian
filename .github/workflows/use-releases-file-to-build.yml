@@ -72,7 +72,7 @@ jobs:
 
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
-            您正在使用kissyouhunter仓库的Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            您正在使用kissyouhunter仓库的Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ github.event.inputs.set_board }}_${{ github.event.inputs.sel_tags_keywords }}_current_${{ github.event.inputs.armbian_kernel }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi 
 
       - name: Checkout
@@ -96,13 +96,13 @@ jobs:
         run: |
           armbian_buildpath="build/output/images"
           [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
-          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${ARMBIAN_VERSION}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${BASE_KERNEL}.img.gz
+          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img.gz
           gzip -df *.img.gz && sync
           cd ${GITHUB_WORKSPACE}
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          cd build/output/images/ && rm -f Armbian_${ARMBIAN_VERSION}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_$BASE_KERNEL.img && sudo gzip *.img && sync
+          cd build/output/images/ && rm -f Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img && sudo gzip *.img && sync
           sudo chmod 777 *.img.gz
           echo "ARMBIAN_N1_NAME=$(ls)" >> $GITHUB_ENV
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
@@ -114,7 +114,7 @@ jobs:
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         with:
           name: ${{ env.ARMBIAN_N1_NAME }}
-          path: ${{ env.FILEPATH }}/armbian_n1
+          path: ${{ env.FILEPATH }}/
 
       - name: telegram_bot
         run: |
