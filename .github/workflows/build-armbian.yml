@@ -156,6 +156,7 @@ jobs:
           cd build/output/images/ && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           sudo mkdir -p armbian && sudo mkdir -p armbian_n1
+          sudo chmod -R 777 *
           mv -v Armbian_*-trunk_*.img.gz armbian/
           mv -v Armbian_*_Aml_s905d_*.img.gz armbian_n1/
           echo "ARMBIAN_NAME=$(ls armbian)" >> $GITHUB_ENV
