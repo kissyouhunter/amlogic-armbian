@@ -11,27 +11,27 @@ on:
     inputs:
       sel_tags_keywords:
         description: "Release: jammy / focal / bullseye"
-        required: false
+        required: true
         default: "jammy"
       armbian_soc:
         description: "Set Amlogic SoC."
-        required: false
+        required: true
         default: "s905d"
       armbian_kernel:
         description: "Set kernel version."
-        required: false
+        required: true
         default: "5.10.161"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
-        required: false
+        required: true
         default: "2748"
       armbian_fstype:
         description: "Set armbian rootfs type: ext4 / btrfs"
-        required: false
+        required: true
         default: "ext4"
       set_board:
         description: "BOARD: lepotato / Odroidn2"
-        required: false
+        required: true
         default: "Odroidn2"  
 
 env:
@@ -73,7 +73,7 @@ jobs:
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
             您正在使用kissyouhunter仓库的Armbian_23.02.0-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi 
-          
+
       - name: Checkout
         uses: actions/checkout@v3
 

@@ -11,35 +11,35 @@ on:
     inputs:
       set_branch:
         description: "Branch: current / edge"
-        required: false
+        required: true
         default: "current"
       set_release:
         description: "Release: jammy / focal / bullseye"
-        required: false
+        required: true
         default: "jammy"
       set_board:
         description: "Board: odroidn2 / lepotato"
-        required: false
+        required: true
         default: "odroidn2"
       set_desktop:
         description: "Build Desktop: no / xfce"
-        required: false
+        required: true
         default: "no"
       armbian_soc:
         description: "Set Amlogic SoC."
-        required: false
+        required: true
         default: "s905d"
       armbian_kernel:
         description: "Set kernel version."
-        required: false
+        required: true
         default: "5.10.161"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
-        required: false
+        required: true
         default: "2748"
       armbian_fstype:
         description: "Set armbian rootfs type: ext4 / btrfs"
-        required: false
+        required: true
         default: "ext4"
       armbian_sign:
         description: "Set armbian custom name."
