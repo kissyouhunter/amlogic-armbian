@@ -102,7 +102,7 @@ jobs:
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          cd build/output/images/ && sudo rm -f Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img && sudo gzip *.img && sync
+          cd build/output/images/ && ls -a && sudo rm -f Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img && sudo gzip *.img && sync
           sudo chmod 777 *.img.gz
           echo "ARMBIAN_N1_NAME=$(ls)" >> $GITHUB_ENV
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
