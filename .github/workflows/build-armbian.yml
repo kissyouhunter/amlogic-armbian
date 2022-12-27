@@ -45,12 +45,19 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
+      armbian_fstype:
+        description: "Set armbian rootfs type: ext4 / btrfs"
+        required: true
+        default: "ext4"
+      upload_firmware:
+        description: "whether to  upload firmware."
+        required: false
+        default: "false"
   #schedule:
     #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
-  UPLOAD_FIRMWARE: true
   SERVERCHAN_SCKEY: true
 
 jobs:
@@ -131,6 +138,9 @@ jobs:
           set_kernel="${{ github.event.inputs.armbian_kernel }}"
           echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
 
+          upload_firmware="${{ github.event.inputs.upload_firmware }}"
+          echo "UPLOAD_FIRMWARE=${upload_firmware}" >> $GITHUB_ENV
+
       - name: Download source code
         id: down
         run: |
@@ -173,7 +183,7 @@ jobs:
 
       - name: Upload firmware to release
         uses: ncipollo/release-action@v1
-        if: steps.organize.outputs.status == 'success' && !cancelled()
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
         with:
           token: ${{ secrets.REPO_TOKEN }}
           name:  Armbian
@@ -191,7 +201,7 @@ jobs:
 
       - name: Upload firmware to release
         uses: ncipollo/release-action@v1
-        if: steps.organize.outputs.status == 'success' && !cancelled()
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
         with:
           token: ${{ secrets.REPO_TOKEN }}
           name:  Armbian_N1
