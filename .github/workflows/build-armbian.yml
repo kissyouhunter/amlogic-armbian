@@ -45,10 +45,6 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
-      armbian_fstype:
-        description: "Set armbian rootfs type: ext4 / btrfs"
-        required: true
-        default: "ext4"
       upload_firmware:
         description: "whether to  upload firmware."
         required: false
