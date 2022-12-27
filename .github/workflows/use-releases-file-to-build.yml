@@ -37,9 +37,9 @@ on:
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
-  BASE_KERNEL: 5.10.129
+  BASE_KERNEL: 6.0.15
   SERVERCHAN_SCKEY: true
-  ARMBIAN_VERSION: 22.08.0
+  ARMBIAN_VERSION: 23.02.0
 
 jobs:
   build:
