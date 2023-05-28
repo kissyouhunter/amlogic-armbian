@@ -102,6 +102,7 @@ jobs:
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
+          mkdir -p /home/runner/work/amlogic-armbian/amlogic-armbian/build/cache
           cd build/
           ./compile.sh \
           RELEASE=${{ inputs.set_release }} \
