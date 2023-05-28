@@ -108,7 +108,7 @@ jobs:
           RELEASE=${{ inputs.set_release }} \
           BOARD=odroidn2 \
           BRANCH=current \
-          BUILD_MINIMAL=yes \
+          BUILD_MINIMAL=no \
           BUILD_ONLY=default \
           BUILD_DESKTOP=no \
           EXPERT=yes \
