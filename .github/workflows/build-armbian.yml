@@ -98,7 +98,7 @@ jobs:
           df -hT ${PWD}
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
 
-      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+      - name: Compile Armbian [ ${{ inputs.set_release }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
