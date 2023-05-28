@@ -9,42 +9,32 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      set_branch:
-        description: "Branch: current / edge"
-        required: true
-        default: "current"
       set_release:
-        description: "Release: jammy / focal / bullseye"
-        required: true
+        description: "Select OS Release."
+        required: false
         default: "jammy"
-      set_board:
-        description: "Board: odroidn2 / lepotato"
-        required: true
-        default: "odroidn2"
-      set_desktop:
-        description: "Build Desktop: no / xfce"
-        required: true
-        default: "no"
-      armbian_soc:
-        description: "Set Amlogic SoC."
-        required: true
-        default: "s905d"
+        type: choice
+        options:
+          - jammy
+          - bullseye
+          - lunar
+          - bookworm
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
       armbian_kernel:
         description: "Set kernel version."
         required: true
-        default: "5.10.161"
+        default: "5.10.180"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: true
         default: "2748"
-      armbian_fstype:
-        description: "Set armbian rootfs type: ext4 / btrfs"
-        required: true
-        default: "ext4"
-      armbian_sign:
-        description: "Set armbian custom name."
-        required: false
-        default: ""
       upload_firmware:
         description: "whether to  upload firmware."
         required: false
@@ -96,45 +86,6 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_BRANCH=("edge" "current" "legacy")
-          set_branch="${{ github.event.inputs.set_branch }}"
-          if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
-              set_branch="current"
-          fi
-          echo "ARMBIAN_BRANCH=${set_branch}" >> $GITHUB_ENV
-
-          ARR_RELEASE=("jammy" "focal" "bullseye")
-          set_release="${{ github.event.inputs.set_release }}"
-          if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="focal"
-          fi
-          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
-
-          ARR_BOARD=("lepotato" "odroidn2")
-          set_board="${{ github.event.inputs.set_board }}"
-          if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
-              set_board="lepotato"
-          fi
-          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
-
-          # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
-          ARR_DESKTOP=("no" "budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
-          set_desktop="${{ github.event.inputs.set_desktop }}"
-          if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
-              # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
-              str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
-              edition_name="${set_desktop}_desktop"
-          else
-              str_desktop="BUILD_DESKTOP=no"
-              edition_name="server"
-          fi
-          echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
-          echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
-
-          set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
-          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
-          echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
-
           set_kernel="${{ github.event.inputs.armbian_kernel }}"
           echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
 
@@ -151,9 +102,9 @@ jobs:
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-          sudo chmod +x compile.sh
-          ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} BUILD_DESKTOP=no \
-          BUILD_ONLY=default EXPERT=yes BUILD_MINIMAL=no KERNEL_CONFIGURE=no CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE=sha
+          ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+                  BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
+                  CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE="sha"
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Rebuild Armbian for Amlogic s9xxx
