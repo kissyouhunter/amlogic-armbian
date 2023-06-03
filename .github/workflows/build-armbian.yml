@@ -111,6 +111,7 @@ jobs:
           BUILD_MINIMAL=no \
           BUILD_ONLY=default \
           BUILD_DESKTOP=no \
+          BUILD_DESKTOP=no \
           EXPERT=yes \
           KERNEL_CONFIGURE=no \
           CLEAN_LEVEL="make,cache,alldebs,sources" \
