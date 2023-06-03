@@ -81,7 +81,6 @@ ADG_CONTAINER_NAME=""
 # x-ui变量
 XUI_DOCKER_IMG_NAME="kissyouhunter/x-ui"
 TAG="latest"
-DEV="dev"
 XUI_PATH=""
 XUI_CONFIG_FOLDER=$(pwd)/x-ui
 XUI_CONTAINER_NAME=""
@@ -192,16 +191,16 @@ TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具�
     if [ "$lsb_dist" == "openwrt" ]; then
         TIME r "****openwrt 宿主机请选择 2 或者 3 安装 docker****"
     else
-    sleep 1
+        sleep 1
         bash <(curl -s -S -L https://raw.githubusercontent.com/kissyouhunter/Tools/main/docker-and-docker_compose.sh)
         TIME g "****docker和docker-compose安装完成，请返回上级菜单!****"
-      sleep 5
+        sleep 5
     fi
   ;;
  2)
     TIME y " >>>>>>>>>>>开始为 X86 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.17-1_x86_64.zip
+    curl -LO https://cloud.kisslove.eu.org/d/onedrive/OPENWRT/files/docker-20.10.17-1_x86_64.zip
     unzip docker-20.10.17-1_x86_64.zip && rm -f docker-20.10.17-1_x86_64.zip
     cd /tmp/upload/docker-20.10.17-1_x86_64 && opkg install *.ipk && cd .. && rm -rf docker-20.10.17-1_x86_64/
     docker -v && docker-compose -v
@@ -211,7 +210,7 @@ TIME l "<注>openwrt 宿主机默认安装 dockerman 图形 docker 管理工具�
  3)
     TIME y " >>>>>>>>>>>开始为 Arm64 openwrt 安装 docker 和 docker-compose"
     mkdir -p /tmp/upload/ && cd /tmp/upload/
-    curl -LO https://cloud.kisslove.eu.org/d/aliyun/files/docker-20.10.17-1_aarch64.zip
+    curl -LO https://cloud.kisslove.eu.org/d/onedrive/OPENWRT/files/docker-20.10.17-1_aarch64.zip
     unzip docker-20.10.17-1_aarch64.zip && rm -f docker-20.10.17-1_aarch64.zip
     cd /tmp/upload/docker-20.10.17-1_aarch64 && opkg install *.ipk
     cd /tmp/upload && rm -rf docker-20.10.17-1_aarch64/
@@ -2385,7 +2384,7 @@ TIME b "(0) 返回上级菜单"
 
   # image 版本
   input_container_xui_image() {
-    echo -n -e "请输入将要拉取镜像[默认为：最新版本latest，输入dev为尝鲜版]-> "
+    echo -n -e "请输入将要拉取镜像[默认为：最新版本latest]-> "
     read image_name
     if [ -z "$image_name" ]; then
         XUI_IMAGE_NAME="latest"
@@ -2431,7 +2430,7 @@ TIME b "(0) 返回上级菜单"
   log "2.开始创建容器并执行"
   docker run -dit \
       -v $DB_PATH:/etc/x-ui/ \
-      -v $CERT_PATH:/root/ \
+      -v $CERT_PATH:/root/cert \
       --name $XUI_CONTAINER_NAME \
       --hostname $XUI_CONTAINER_NAME \
       --restart always \
