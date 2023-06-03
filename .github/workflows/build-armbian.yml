@@ -110,7 +110,7 @@ jobs:
           BRANCH=current \
           BUILD_MINIMAL=no \
           BUILD_ONLY=default \
-          BUILD_DESKTOP=no \
+          HOST=armbian \
           BUILD_DESKTOP=no \
           EXPERT=yes \
           KERNEL_CONFIGURE=no \
