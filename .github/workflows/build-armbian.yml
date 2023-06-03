@@ -62,7 +62,7 @@ jobs:
           ls -a
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
-            您正在使用kissyouhunter仓库的 {CPU型号为 [ ${CPUNAME} ] 核心数 为 [ ${CPUCORES} ] 线程数为 [ $(nproc) ]的机器} 编译 Armbian ${{ github.event.inputs.set_board }} ${{ github.event.inputs.set_release }} ${{ github.event.inputs.armbian_kernel }} for N1 编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            您正在使用kissyouhunter仓库的 {CPU型号为 [ ${CPUNAME} ] 核心数 为 [ ${CPUCORES} ] 线程数为 [ $(nproc) ]的机器} 编译 Armbian ${{ inputs.set_release }} ${{ github.event.inputs.armbian_kernel }} for N1 编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi 
 
       - name: Checkout
@@ -193,5 +193,5 @@ jobs:
         run: |
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的✨主人✨：
-            您使用kissyouhunter仓库的 Armbian ${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_KERNEL }} for N1 固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            您使用kissyouhunter仓库的 Armbian ${{ inputs.set_release }} ${{ env.ARMBIAN_KERNEL }} for N1 固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi
