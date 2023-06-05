@@ -196,8 +196,7 @@ jobs:
 
       - name: Upload to OneDrive
       run: |
-        cd upload/
-        rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ jollifia_kisse5:onedrive/N1_ARMBIAN
+          rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ jollifia_kisse5:onedrive/N1_ARMBIAN
 
       - name: Notify on failure
       if: ${{ failure() }}
