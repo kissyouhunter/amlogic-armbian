@@ -77,7 +77,7 @@ if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; th
         LATEST_VERSION_K15="5.15.${LATEST_VERSION_K15_LATEST}"
 
         LATEST_VERSION_K61_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "6.1.[0-9]+"  | sed -e "s/6.1.//g" | sort -n | sed -n '$p')
-        LATEST_VERSION_K61="6.1.${LATEST_VERSION_K15_LATEST}"
+        LATEST_VERSION_K61="6.1.${LATEST_VERSION_K61_LATEST}"
 
         echo  "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} / ${LATEST_VERSION_K61} ]"
 		echo  "最新的内核版本为: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} / ${LATEST_VERSION_K15} / ${LATEST_VERSION_K61} ]"
