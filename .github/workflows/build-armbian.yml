@@ -176,7 +176,11 @@ jobs:
 
             * bullseye debian 11
 
+            * bookworm debian 12
+
             * jammy ubuntu 22.04
+
+            * lunar ubuntu 23.04
 
             * ID: root Password: 1234
 
@@ -186,7 +190,7 @@ jobs:
 
             * 常用命令armbian-config（配置ip、cpu等配置）; armbian-install（安装到emmc）; armbian-docker （一键安装docker）；armbian-update（更新内核）；armbian-container（一键安装常用docker容器）。
 
-            * 下载跳转[国内](https://cloud.kisslove.eu.org/)
+            * 下载跳转 [国内](https://cloud.kisslove.eu.org/)
           artifacts: ${{ env.FIRMWARE }}/armbian_n1/*.img.gz
 
       - name: Setup Rclone
