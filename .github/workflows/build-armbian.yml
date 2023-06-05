@@ -189,21 +189,6 @@ jobs:
             * 下载跳转[国内](https://cloud.kisslove.eu.org/)
           artifacts: ${{ env.FIRMWARE }}/armbian_n1/*.img.gz
 
-      - name: Setup Rclone
-      uses: AnimMouse/setup-rclone@v1
-      with:
-        rclone_config: ${{ secrets.RCLONE_CONFIG }}
-
-      - name: Upload to OneDrive
-      run: |
-          rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ jollifia_kisse5:onedrive/N1_ARMBIAN
-
-      - name: Notify on failure
-      if: ${{ failure() }}
-      run: |
-          curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的😭主人😭：
-          您使用kissyouhunter仓库的 Armbian ${{ inputs.set_release }} ${{ env.ARMBIAN_KERNEL }} for N1 固件失败了,请及时处理！😭" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
-
       - name: telegram_bot
         run: |
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
