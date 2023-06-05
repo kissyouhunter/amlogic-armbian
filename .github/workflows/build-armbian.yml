@@ -189,6 +189,11 @@ jobs:
             * 下载跳转[国内](https://cloud.kisslove.eu.org/)
           artifacts: ${{ env.FIRMWARE }}/armbian_n1/*.img.gz
 
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
       - name: telegram_bot
         run: |
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
