@@ -30,7 +30,7 @@ on:
       armbian_kernel:
         description: "Set kernel version."
         required: true
-        default: "5.10.180"
+        default: "5.10.191"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: true
