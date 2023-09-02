@@ -1,0 +1,215 @@
+#==========================================================================
+# Description: Build Armbian For Amlogic s9xxx tv box
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#==========================================================================
+
+name: Build armbian with desktop
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_release:
+        description: "Select OS Release."
+        required: false
+        default: "jammy"
+        type: choice
+        options:
+          - jammy
+          - bullseye
+          - lunar
+          - bookworm
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
+      armbian_kernel:
+        description: "Set kernel version."
+        required: true
+        default: "5.10.191"
+      armbian_size:
+        description: "Set armbian rootfs size(Unit: MiB)."
+        required: true
+        default: "2748"
+      upload_firmware:
+        description: "whether to  upload firmware."
+        required: false
+        default: "false"
+  #schedule:
+    #- cron: "0 17 * * 0"
+
+env:
+  TZ: Asia/Shanghai
+  SERVERCHAN_SCKEY: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: telegrame_bot
+        run: |
+          cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c > CPU
+          cat /proc/cpuinfo | grep "cpu cores" | uniq >> CPU
+          sed -i 's|[[:space:]]||g; s|^.||' CPU && sed -i 's|CPU||g; s|pucores:||' CPU
+          CPUNAME="$(awk 'NR==1' CPU)" && CPUCORES="$(awk 'NR==2' CPU)"
+          rm -rf CPU
+          ls -a
+          if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+            curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
+            您正在使用kissyouhunter仓库的 {CPU型号为 [ ${CPUNAME} ] 核心数 为 [ ${CPUCORES} ] 线程数为 [ $(nproc) ]的机器} 编译 Armbian ${{ inputs.set_release }} ${{ github.event.inputs.armbian_kernel }} for N1 编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          fi 
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi `docker images -q`
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+          sudo -E apt-get -qq update
+          sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+          sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+          sudo -E systemctl daemon-reload
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+
+          set_kernel="${{ github.event.inputs.armbian_kernel }}"
+          echo "ARMBIAN_KERNEL=${set_kernel}" >> $GITHUB_ENV
+
+          upload_firmware="${{ github.event.inputs.upload_firmware }}"
+          echo "UPLOAD_FIRMWARE=${upload_firmware}" >> $GITHUB_ENV
+
+      - name: Download source code
+        id: down
+        run: |
+          df -hT ${PWD}
+          git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
+
+      - name: Compile Armbian [ ${{ inputs.set_release }} ]
+        id: compile
+        run: |
+          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
+          mkdir -p /home/runner/work/amlogic-armbian/amlogic-armbian/build/cache
+          cd build/
+          ./compile.sh \
+          RELEASE=${{ inputs.set_release }} \
+          BOARD=odroidn2 \
+          BRANCH=current \
+          BUILD_MINIMAL=no \
+          BUILD_ONLY=default \
+          HOST=armbian \
+          BUILD_DESKTOP=yes \
+          EXPERT=yes \
+          KERNEL_CONFIGURE=no \
+          CLEAN_LEVEL="make,cache,alldebs,sources" \
+          COMPRESS_OUTPUTIMAGE="sha"
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Rebuild Armbian for Amlogic s9xxx
+        id: rebuild
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        run: |
+          sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
+          sudo chmod +x rebuild
+          sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
+          cd build/output/images/ && sudo gzip *.img && sync
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          sudo mkdir -p armbian && sudo mkdir -p armbian_n1
+          sudo chmod -R 777 armbian armbian_n1 *.img.gz
+          sudo mv -v Armbian_*-trunk_*.img.gz armbian/
+          sudo mv -v Armbian_*_Aml_s905d_*.img.gz armbian_n1/
+          echo "ARMBIAN_NAME=$(ls armbian)" >> $GITHUB_ENV
+          echo "ARMBIAN_N1_NAME=$(ls armbian_n1)" >> $GITHUB_ENV
+          echo "FILE_DATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+
+      - name: Upload Armbian image
+        uses: actions/upload-artifact@master
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        with:
+          name: ${{ env.ARMBIAN_NAME }}
+          path: ${{ env.FIRMWARE }}/armbian
+
+      - name: Upload firmware to release
+        uses: ncipollo/release-action@v1
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          name:  Armbian
+          tag: Armbian
+          commit: main
+          allowUpdates: true
+          artifacts: ${{ env.FIRMWARE }}/armbian/*.img.gz
+
+      - name: Upload N1 Armbian image
+        uses: actions/upload-artifact@master
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        with:
+          name: ${{ env.ARMBIAN_N1_NAME }}
+          path: ${{ env.FIRMWARE }}/armbian_n1
+
+      - name: Upload firmware to release
+        uses: ncipollo/release-action@v1
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          name:  Armbian_N1
+          tag: Armbian
+          commit: main
+          allowUpdates: true
+          repo: Openwrt_X86-Openwrt_N1-Armbian_N1
+          body: |
+            ## Armbian_N1:
+
+            * bullseye debian 11
+
+            * bookworm debian 12
+
+            * jammy ubuntu 22.04
+
+            * lunar ubuntu 23.04
+
+            * ID: root Password: 1234
+
+            * 第一次登陆强制修改密码
+
+            * U盘使用请扩展roofts分区（工具https://github.com/kissyouhunter/Openwrt_X86-Openwrt_N1-Armbian_N1/blob/main/DiskGenius/DiskGenius.5.1.1.x86.Pro.7z ）
+
+            * 常用命令armbian-config（配置ip、cpu等配置）; armbian-install（安装到emmc）; armbian-docker （一键安装docker）；armbian-update（更新内核）；armbian-container（一键安装常用docker容器）。
+
+            * 下载跳转 [国内](https://cloud.kisslove.eu.org/)
+          artifacts: ${{ env.FIRMWARE }}/armbian_n1/*.img.gz
+
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
+      - name: Upload to OneDrive
+        run: rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ jollifia_kisse5:onedrive/N1_ARMBIAN
+
+      - name: Notify on failure
+        if: ${{ failure() }}
+        run: |
+          curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的😭主人😭：
+          您使用kissyouhunter仓库的 Armbian ${{ inputs.set_release }} ${{ env.ARMBIAN_KERNEL }} for N1 固件失败了,请及时处理！😭" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+
+      - name: telegram_bot
+        run: |
+          if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
+            curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的✨主人✨：
+            您使用kissyouhunter仓库的 Armbian ${{ inputs.set_release }} ${{ env.ARMBIAN_KERNEL }} for N1 固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          fi
