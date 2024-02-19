@@ -132,8 +132,9 @@ jobs:
           BUILD_DESKTOP=no \
           EXPERT=yes \
           KERNEL_CONFIGURE=no \
-          CLEAN_LEVEL="make,cache,alldebs,sources" \
-          COMPRESS_OUTPUTIMAGE="sha"
+          #CLEAN_LEVEL="make,cache,alldebs,sources" \
+          COMPRESS_OUTPUTIMAGE="sha" \
+          SHARE_LOG=yes
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Rebuild Armbian for Amlogic s9xxx
