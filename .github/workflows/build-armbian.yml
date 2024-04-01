@@ -218,7 +218,7 @@ jobs:
           rclone_config: ${{ secrets.RCLONE_CONFIG }}
 
       - name: Upload to OneDrive
-        run: rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ jollifia_kisse5:onedrive/N1_ARMBIAN
+        run: rclone -v moveto ${{ env.FIRMWARE }}/armbian_n1/ kiss_blockads:onedrive/N1_ARMBIAN
 
       - name: Notify on failure
         if: ${{ failure() }}
