@@ -20,7 +20,7 @@ on:
       armbian_kernel:
         description: "Set kernel version."
         required: true
-        default: "5.10.161"
+        default: "5.4.273"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: true
@@ -37,9 +37,9 @@ on:
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
-  BASE_KERNEL: 6.0.15
+  BASE_KERNEL: 6.1.35
   SERVERCHAN_SCKEY: true
-  ARMBIAN_VERSION: 23.02.0
+  ARMBIAN_VERSION: 23.08.0
 
 jobs:
   build:
