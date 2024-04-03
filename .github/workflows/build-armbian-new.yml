@@ -115,6 +115,8 @@ jobs:
           tag: Armbian
           commit: main
           allowUpdates: true
+          body: |
+            ## Armbain Base for Amlogic N1
           artifacts: build/output/images/*.img.gz
 
       - name: Notify on failure
