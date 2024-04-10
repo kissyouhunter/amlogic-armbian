@@ -22,7 +22,8 @@ on:
 
 env:
   TZ: America/New_York
-  ROOTFS_SCRIPT: compile-kernel/tools/script/armbian_rootfs.sh
+  SH_URL: https://github.com/ophub/amlogic-s9xxx-armbian/raw/main/compile-kernel/tools/script/armbian_rootfs.sh
+  ROOTFS_SCRIPT: ./armbian_rootfs.sh
 
 jobs:
   build:
@@ -111,9 +112,9 @@ jobs:
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         run: |
           # Organize and keep essential files, delete unnecessary files
-          wget https://github.com/ophub/amlogic-s9xxx-armbian/raw/main/compile-kernel/tools/script/armbian_rootfs.sh
-          chmod +x armbian_rootfs.sh
-          armbian_rootfs.sh -v ${{ inputs.set_release }}
+          wget ${SH_URL}
+          chmod +x ${ROOTFS_SCRIPT}
+          ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }}
 
           # Output cleaning result information
           df -hT ${PWD}
