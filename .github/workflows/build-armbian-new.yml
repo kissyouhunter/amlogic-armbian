@@ -106,9 +106,23 @@ jobs:
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
 
+      - name: Organize files and clear space
+        id: clean
+        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        run: |
+          # Organize and keep essential files, delete unnecessary files
+          wget https://github.com/ophub/amlogic-s9xxx-armbian/raw/main/compile-kernel/tools/script/armbian_rootfs.sh
+          chmod +x armbian_rootfs.sh
+          armbian_rootfs.sh -v ${{ inputs.set_release }}
+
+          # Output cleaning result information
+          df -hT ${PWD}
+          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
       - name: Upload firmware to release
         uses: ncipollo/release-action@v1
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: steps.clean.outputs.status == 'success' && !cancelled()
         with:
           token: ${{ secrets.REPO_TOKEN }}
           name:  Armbian
