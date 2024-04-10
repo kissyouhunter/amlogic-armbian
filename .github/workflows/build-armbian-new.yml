@@ -108,7 +108,7 @@ jobs:
 
       - name: Upload firmware to release
         uses: ncipollo/release-action@v1
-        if: steps.compile.status == 'success' && !cancelled()
+        if: steps.compile.outputs.status == 'success' && !cancelled()
         with:
           token: ${{ secrets.REPO_TOKEN }}
           name:  Armbian
