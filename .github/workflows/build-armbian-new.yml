@@ -108,7 +108,7 @@ jobs:
 
       - name: Upload firmware to release
         uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && !cancelled()
+        if: steps.compile.status == 'success' && !cancelled()
         with:
           token: ${{ secrets.REPO_TOKEN }}
           name:  Armbian
@@ -117,7 +117,7 @@ jobs:
           allowUpdates: true
           body: |
             ## Armbain Base for Amlogic N1
-          artifacts: build/output/images/*.img.gz
+          artifacts: build/output/images/*
 
       - name: Notify on failure
         if: ${{ failure() }}
