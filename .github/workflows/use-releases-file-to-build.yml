@@ -33,10 +33,10 @@ on:
         description: "6.6.x"
         required: true
         default: "6.6.26"
-      armbian_version:
-        description: "24.xx.xx"
-        required: true
-        default: "24.05.0
+      #armbian_version:
+      #  description: "24.xx.xx"
+      #  required: true
+      #  default: "24.05.0
 
 env:
   TZ: Asia/Shanghai
