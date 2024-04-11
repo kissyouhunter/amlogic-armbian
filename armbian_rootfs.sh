@@ -99,10 +99,10 @@ redo_rootfs() {
     } || error_msg "03. Failed to find Armbian image!"
 
     # Add sha256sum verification files
-    cd ${image_path}/
-    sudo rm -rf $(ls . | grep -vE ".img.gz|.tar.gz" | xargs) 2>/dev/null
-    for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
-    [[ "${?}" == "0" ]] && echo -e "${INFO} 04. The files in the current directory:\n$(ls -l .)" || error_msg "04. Failed to add sha256sum!"
+    #cd ${image_path}/
+    #sudo rm -rf $(ls . | grep -vE ".img.gz|.tar.gz" | xargs) 2>/dev/null
+    #for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
+    #[[ "${?}" == "0" ]] && echo -e "${INFO} 04. The files in the current directory:\n$(ls -l .)" || error_msg "04. Failed to add sha256sum!"
 
     # Delete Armbian build source codes and temporary files
     cd ${build_path}/
