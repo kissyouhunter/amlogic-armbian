@@ -59,7 +59,7 @@ armbian_release_file="etc/armbian-release"
 # Add custom armbian firmware information
 ophub_release_file="etc/ophub-release"
 # Kernel files download repository
-kernel_repo="https://github.com/kissyouhunter/kernel_N1/tree/main/kernel"
+kernel_repo="https://github.com/kissyouhunter/kernel_N1.git"
 #kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch=""
 auto_kernel="true"
@@ -212,56 +212,45 @@ find_armbian() {
 download_kernel() {
     cd ${make_path}
 
-    # Convert kernel library address to svn format
-    if [[ "${kernel_repo}" == http* && -n "$(echo ${kernel_repo} | grep "tree/main")" ]]; then
-        kernel_repo="${kernel_repo//tree\/main/trunk}"
-    fi
-    kernel_repo="${kernel_repo}/${version_branch}"
-
-    # Set empty array
+    # 设置空数组
     tmp_arr_kernels=()
 
-    # Convert kernel library address to API format
-    server_kernel_url="${kernel_repo#*com\/}"
-    server_kernel_url="${server_kernel_url//trunk/contents}"
-    server_kernel_url="https://api.github.com/repos/${server_kernel_url}"
-
-    # Query the latest kernel in a loop
+    # 循环查询最新内核版本
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
-        echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
-        # Identify the kernel mainline
+        echo -e "(${i}) 自动查询同系列的最新内核版本 [ ${KERNEL_VAR} ]"
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
-        # Check the version on the server (e.g LATEST_VERSION="124")
-        LATEST_VERSION="$(curl -s "${server_kernel_url}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
-        if [[ "${?}" -eq "0" && -n "${LATEST_VERSION}" ]]; then
+        # 使用 Git 命令替代之前的 SVN 操作
+        # 注意: 下面的命令是示意性的，实际操作可能需要根据你的需求进行调整
+        LATEST_VERSION="$(git ls-remote --tags ${kernel_repo} | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | tail -n 1)"
+        if [[ -n "${LATEST_VERSION}" ]]; then
             tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
         else
             tmp_arr_kernels[${i}]="${KERNEL_VAR}"
         fi
-        echo -e "(${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+        echo -e "(${i}) [ ${tmp_arr_kernels[$i]} ] 是最新的内核。\n"
 
-        let i++
+        ((i++))
     done
 
-    # Reset the kernel array to the latest kernel version
-    unset build_kernel
-    build_kernel="${tmp_arr_kernels[*]}"
+    # 重置内核数组为最新内核版本
+    build_kernel=("${tmp_arr_kernels[@]}")
 
-    # Synchronization related kernel
+    # 同步相关内核
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
         if [[ ! -d "${kernel_path}/${KERNEL_VAR}" ]]; then
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${KERNEL_VAR} ]"
-            svn export ${kernel_repo}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} --force
+            echo -e "(${i}) 从 [ ${kernel_repo} ] 加载 [ ${KERNEL_VAR} ] 内核"
+            git clone --depth 1 --branch ${KERNEL_VAR} ${kernel_repo} ${kernel_path}/${KERNEL_VAR}
         else
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
+            echo -e "(${i}) [ ${KERNEL_VAR} ] 内核已在本地目录。"
         fi
 
-        let i++
+        ((i++))
     done
 
     sync
+
 }
 
 confirm_version() {
