@@ -132,7 +132,7 @@ jobs:
           allowUpdates: true
           body: |
             ## Armbain Base for Amlogic N1
-          artifacts: build/output/images/*.tar.gz
+          artifacts: build/output/images/*
 
       - name: Notify on failure
         if: ${{ failure() }}
