@@ -36,7 +36,7 @@ on:
       armbian_version:
         description: "24.xx.xx"
         required: true
-        default: "24.05.0
+        default: "24.05.0"
 
 env:
   TZ: Asia/Shanghai
