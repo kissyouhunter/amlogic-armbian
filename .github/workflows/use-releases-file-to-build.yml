@@ -10,9 +10,14 @@ on:
   workflow_dispatch:
     inputs:
       sel_tags_keywords:
-        description: "Release: jammy / focal / bullseye"
+        description: "Select OS Release."
         required: true
         default: "jammy"
+        type: choice
+        options:
+          - jammy
+          - bullseye
+          - bookworm
       armbian_soc:
         description: "Set Amlogic SoC."
         required: true
