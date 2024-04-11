@@ -29,17 +29,17 @@ on:
         description: "Set armbian rootfs type: ext4 / btrfs"
         required: true
         default: "ext4"
-      set_board:
-        description: "BOARD: lepotato / Odroidn2"
-        required: true
-        default: "Odroidn2"  
+      #set_board:
+      #  description: "BOARD: lepotato / Odroidn2"
+      #  required: true
+      #  default: "Odroidn2"  
 
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
   BASE_KERNEL: 6.1.35
   SERVERCHAN_SCKEY: true
-  ARMBIAN_VERSION: 23.08.0
+  ARMBIAN_VERSION: 24.05.0
 
 jobs:
   build:
