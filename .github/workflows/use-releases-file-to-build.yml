@@ -95,13 +95,6 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
-      - name: Combine Disks
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 1024
-          temp-reserve-mb: 100
-          root-reserve-mb: 1024
-
       - name: Download Armbian from Releases & Rebuild Armbian for Amlogic s9xxx
         id: rebuild
         if: (!cancelled())
