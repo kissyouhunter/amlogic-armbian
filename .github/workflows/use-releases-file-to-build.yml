@@ -29,17 +29,19 @@ on:
         description: "Set armbian rootfs type: ext4 / btrfs"
         required: true
         default: "ext4"
-      #set_board:
-      #  description: "BOARD: lepotato / Odroidn2"
-      #  required: true
-      #  default: "Odroidn2"  
+      base_kernel:
+        description: "6.6.x"
+        required: true
+        default: "6.6.26"
+      armbian_version:
+        description: "24.xx.xx"
+        required: true
+        default: "24.05.0
 
 env:
   TZ: Asia/Shanghai
   UPLOAD_FIRMWARE: true
-  BASE_KERNEL: 6.1.35
   SERVERCHAN_SCKEY: true
-  ARMBIAN_VERSION: 24.05.0
 
 jobs:
   build:
@@ -72,7 +74,7 @@ jobs:
 
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=🎉 主人：
-            您正在使用kissyouhunter仓库的Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ github.event.inputs.set_board }}_${{ github.event.inputs.sel_tags_keywords }}_current_${{ github.event.inputs.armbian_kernel }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            您正在使用kissyouhunter仓库的Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ github.event.inputs.set_board }}_${{ github.event.inputs.sel_tags_keywords }}_current_${{ github.event.inputs.armbian_kernel }}编译您自己的固件,请耐心等待...... 😋" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi 
 
       - name: Checkout
@@ -96,13 +98,13 @@ jobs:
         run: |
           armbian_buildpath="build/output/images"
           [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
-          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img.gz
+          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img.gz
           gzip -df *.img.gz && sync
           cd ${GITHUB_WORKSPACE}
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          cd build/output/images/ && ls -a && sudo rm -f Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.BASE_KERNEL }}.img sha256sums && ls && sync
+          cd build/output/images/ && ls -a && sudo rm -f Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img.gz sha256sums && ls && sync
           sudo chmod 777 *.img.gz
           echo "ARMBIAN_N1_NAME=$(ls)" >> $GITHUB_ENV
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
@@ -120,5 +122,5 @@ jobs:
         run: |
           if [[ "${SERVERCHAN_SCKEY}" == "true" ]]; then
             curl -k --data chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=我亲爱的✨主人✨：
-            您使用kissyouhunter仓库的 Armbian_${{ env.ARMBIAN_VERSION }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            您使用kissyouhunter仓库的 Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_BOARD }}_${{ env.ARMBIAN_RELEASE }}_current_${{ env.ARMBIAN_KERNEL }}固件顺利编译完成了！💐" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
           fi          
