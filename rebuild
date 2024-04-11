@@ -212,16 +212,15 @@ find_armbian() {
 download_kernel() {
     cd ${make_path}
 
-    # 设置空数组
+    # 定义存储内核版本的数组
     tmp_arr_kernels=()
 
-    # 循环查询最新内核版本
+    # 查询并处理每个内核版本
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
         echo -e "(${i}) 自动查询同系列的最新内核版本 [ ${KERNEL_VAR} ]"
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
-        # 使用 Git 命令替代之前的 SVN 操作
-        # 注意: 下面的命令是示意性的，实际操作可能需要根据你的需求进行调整
+        # 使用 Git 命令查询标签来确定最新版本
         LATEST_VERSION="$(git ls-remote --tags ${kernel_repo} | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | tail -n 1)"
         if [[ -n "${LATEST_VERSION}" ]]; then
             tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
@@ -233,15 +232,22 @@ download_kernel() {
         ((i++))
     done
 
-    # 重置内核数组为最新内核版本
+    # 更新内核数组为最新版本
     build_kernel=("${tmp_arr_kernels[@]}")
 
-    # 同步相关内核
+    # 克隆或更新内核
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
-        if [[ ! -d "${kernel_path}/${KERNEL_VAR}" ]]; then
+        # 确定目标路径
+        target_path="${kernel_path}/${KERNEL_VAR}"
+        if [[ ! -d "${target_path}" ]]; then
             echo -e "(${i}) 从 [ ${kernel_repo} ] 加载 [ ${KERNEL_VAR} ] 内核"
-            git clone --depth 1 --branch ${KERNEL_VAR} ${kernel_repo} ${kernel_path}/${KERNEL_VAR}
+            # 克隆整个仓库
+            git clone --depth 1 --branch ${KERNEL_VAR} ${kernel_repo} "${target_path}_temp"
+            # 移动到目标路径
+            mv "${target_path}_temp/kernel/"* "${target_path}"
+            # 清理临时目录
+            rm -rf "${target_path}_temp"
         else
             echo -e "(${i}) [ ${KERNEL_VAR} ] 内核已在本地目录。"
         fi
