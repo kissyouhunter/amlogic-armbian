@@ -107,7 +107,7 @@ jobs:
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s905d -k ${{ env.ARMBIAN_KERNEL }}
-          cd build/output/images/ && ls -a && sudo rm -f Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img.gz sha256sums && ls && sync
+          cd build/output/images/ && ls -a && sudo rm -f Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img sha256sums && ls && sync
           sudo chmod 777 *.img.gz
           echo "ARMBIAN_N1_NAME=$(ls)" >> $GITHUB_ENV
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
