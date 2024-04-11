@@ -212,49 +212,54 @@ find_armbian() {
 download_kernel() {
     cd ${make_path}
 
-    # 定义存储内核版本的数组
+    # 克隆仓库（仅限第一次需要，之后可以只拉取更新）
+    if [ ! -d "kernel_N1" ]; then
+        git clone ${kernel_repo}
+    else
+        cd kernel_N1
+        git pull
+        cd ..
+    fi
+
+    # 准备处理内核版本
     tmp_arr_kernels=()
 
-    # 查询并处理每个内核版本
-    i=1
+    # 循环每个要构建的内核版本
+    i=0
     for KERNEL_VAR in ${build_kernel[*]}; do
         echo -e "(${i}) 自动查询同系列的最新内核版本 [ ${KERNEL_VAR} ]"
-        MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
-        # 使用 Git 命令查询标签来确定最新版本
-        LATEST_VERSION="$(git ls-remote --tags ${kernel_repo} | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | tail -n 1)"
+        MAIN_LINE="${KERNEL_VAR}"
+        # 确定最新版本
+        LATEST_VERSION=$(ls kernel_N1/kernel/ | grep "^${MAIN_LINE}" | sort -V | tail -n 1)
         if [[ -n "${LATEST_VERSION}" ]]; then
-            tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+            tmp_arr_kernels[${i}]="${LATEST_VERSION}"
         else
             tmp_arr_kernels[${i}]="${KERNEL_VAR}"
         fi
-        echo -e "(${i}) [ ${tmp_arr_kernels[$i]} ] 是最新的内核。\n"
-
+        echo -e "(${i}) [ ${tmp_arr_kernels[${i}]} ] 是最新的内核。\n"
         ((i++))
     done
 
-    # 更新内核数组为最新版本
+    # 更新内核版本数组为最新版本
     build_kernel=("${tmp_arr_kernels[@]}")
 
-    # 克隆或更新内核
-    i=1
+    # 同步相关内核
+    i=0
     for KERNEL_VAR in ${build_kernel[*]}; do
-        # 确定目标路径
         target_path="${kernel_path}/${KERNEL_VAR}"
         if [[ ! -d "${target_path}" ]]; then
-            echo -e "(${i}) 从 [ ${kernel_repo} ] 加载 [ ${KERNEL_VAR} ] 内核"
-            # 克隆整个仓库
-            git clone --depth 1 --branch ${KERNEL_VAR} ${kernel_repo} "${target_path}_temp"
-            # 移动到目标路径
-            mv "${target_path}_temp/kernel/"* "${target_path}"
-            # 清理临时目录
-            rm -rf "${target_path}_temp"
+            echo -e "(${i}) 复制 [ ${KERNEL_VAR} ] 内核到本地目录"
+            # 创建目标路径
+            mkdir -p "${target_path}"
+            # 复制内核文件
+            cp -r "kernel_N1/kernel/${KERNEL_VAR}"/* "${target_path}/"
         else
             echo -e "(${i}) [ ${KERNEL_VAR} ] 内核已在本地目录。"
         fi
-
         ((i++))
     done
 
+    # 同步文件系统，确保写入完成
     sync
 
 }
