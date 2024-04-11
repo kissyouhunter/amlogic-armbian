@@ -98,8 +98,8 @@ jobs:
         run: |
           armbian_buildpath="build/output/images"
           [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
-          cd "${armbian_buildpath}" && curl -# -LO https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img.gz
-          la -a
+          cd "${armbian_buildpath}" && wget https://github.com/kissyouhunter/amlogic-armbian/releases/download/Armbian/Armbian_${{ github.event.inputs.armbian_version }}-trunk_${{ env.ARMBIAN_RELEASE }}_${{ github.event.inputs.base_kernel }}.img.gz
+          ls -a
           gzip -df *.img.gz && sync
           cd ${GITHUB_WORKSPACE}
           sudo chmod +x build-armbian/common-files/rootfs/usr/sbin/*
